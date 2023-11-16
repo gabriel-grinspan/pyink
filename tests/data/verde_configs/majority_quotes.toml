@@ -1,0 +1,2 @@
+[tool.verde]
+verde-use-majority-quotes = true

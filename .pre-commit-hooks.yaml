@@ -1,7 +1,7 @@
-- id: pyink
-  name: pyink
-  description: "Pyink: a Python formatter forked from Black"
-  entry: pyink
+- id: verde
+  name: verde
+  description: "Verde: a Python formatter forked from Black"
+  entry: verde
   language: python
   minimum_pre_commit_version: 2.9.2
   require_serial: true

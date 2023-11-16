@@ -1,0 +1,3 @@
+[tool.black]
+verde = true
+verde-indentation = 2

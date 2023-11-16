@@ -10,11 +10,11 @@ from functools import partial
 from pathlib import Path
 from typing import Any, Iterator, List, Optional, Tuple
 
-import pyink
-from pyink.const import DEFAULT_LINE_LENGTH
-from pyink.debug import DebugVisitor
-from pyink.mode import TargetVersion
-from pyink.output import diff, err, out
+import verde
+from verde.const import DEFAULT_LINE_LENGTH
+from verde.debug import DebugVisitor
+from verde.mode import TargetVersion
+from verde.output import diff, err, out
 
 from . import conftest
 
@@ -34,14 +34,14 @@ PY36_VERSIONS = {
     TargetVersion.PY39,
 }
 
-DEFAULT_MODE = pyink.Mode()
-ff = partial(pyink.format_file_in_place, mode=DEFAULT_MODE, fast=True)
-fs = partial(pyink.format_str, mode=DEFAULT_MODE)
+DEFAULT_MODE = verde.Mode()
+ff = partial(verde.format_file_in_place, mode=DEFAULT_MODE, fast=True)
+fs = partial(verde.format_str, mode=DEFAULT_MODE)
 
 
 @dataclass
 class TestCaseArgs:
-    mode: pyink.Mode = field(default_factory=pyink.Mode)
+    mode: verde.Mode = field(default_factory=verde.Mode)
     fast: bool = False
     minimum_version: Optional[Tuple[int, int]] = None
 
@@ -54,7 +54,7 @@ def _assert_format_equal(expected: str, actual: str) -> None:
         if conftest.PRINT_FULL_TREE:
             out("Expected tree:", fg="green")
         try:
-            exp_node = pyink.lib2to3_parse(expected)
+            exp_node = verde.lib2to3_parse(expected)
             bdv = DebugVisitor(print_output=conftest.PRINT_FULL_TREE)
             list(bdv.visit(exp_node))
             expected_out = "\n".join(bdv.list_output)
@@ -63,7 +63,7 @@ def _assert_format_equal(expected: str, actual: str) -> None:
         if conftest.PRINT_FULL_TREE:
             out("Actual tree:", fg="red")
         try:
-            exp_node = pyink.lib2to3_parse(actual)
+            exp_node = verde.lib2to3_parse(actual)
             bdv = DebugVisitor(print_output=conftest.PRINT_FULL_TREE)
             list(bdv.visit(exp_node))
             actual_out = "\n".join(bdv.list_output)
@@ -89,7 +89,7 @@ class FormatFailure(Exception):
 def assert_format(
     source: str,
     expected: str,
-    mode: pyink.Mode = DEFAULT_MODE,
+    mode: verde.Mode = DEFAULT_MODE,
     *,
     fast: bool = False,
     minimum_version: Optional[Tuple[int, int]] = None,
@@ -139,12 +139,12 @@ def assert_format(
 def _assert_format_inner(
     source: str,
     expected: Optional[str] = None,
-    mode: pyink.Mode = DEFAULT_MODE,
+    mode: verde.Mode = DEFAULT_MODE,
     *,
     fast: bool = False,
     minimum_version: Optional[Tuple[int, int]] = None,
 ) -> None:
-    actual = pyink.format_str(source, mode=mode)
+    actual = verde.format_str(source, mode=mode)
     if expected is not None:
         _assert_format_equal(expected, actual)
     # It's not useful to run safety checks if we're expecting no changes anyway. The
@@ -155,8 +155,8 @@ def _assert_format_inner(
         # being able to parse the code being formatted. This doesn't always work out
         # when checking modern code on older versions.
         if minimum_version is None or sys.version_info >= minimum_version:
-            pyink.assert_equivalent(source, actual)
-        pyink.assert_stable(source, actual, mode=mode)
+            verde.assert_equivalent(source, actual)
+        verde.assert_stable(source, actual, mode=mode)
 
 
 def dump_to_stderr(*output: str) -> str:
@@ -239,15 +239,15 @@ def get_flags_parser() -> argparse.ArgumentParser:
             " version works correctly."
         ),
     )
-    parser.add_argument("--pyink", default=False, action="store_true")
-    parser.add_argument("--pyink-indentation", default=4, type=int, choices=[2, 4])
+    parser.add_argument("--verde", default=False, action="store_true")
+    parser.add_argument("--verde-indentation", default=4, type=int, choices=[2, 4])
     return parser
 
 
 def parse_mode(flags_line: str) -> TestCaseArgs:
     parser = get_flags_parser()
     args = parser.parse_args(shlex.split(flags_line))
-    mode = pyink.Mode(
+    mode = verde.Mode(
         target_versions=set(args.target_version),
         line_length=args.line_length,
         string_normalization=not args.skip_string_normalization,
@@ -255,8 +255,8 @@ def parse_mode(flags_line: str) -> TestCaseArgs:
         is_ipynb=args.ipynb,
         magic_trailing_comma=not args.skip_magic_trailing_comma,
         preview=args.preview,
-        is_pyink=args.pyink,
-        pyink_indentation=args.pyink_indentation,
+        is_verde=args.verde,
+        verde_indentation=args.verde_indentation,
     )
     return TestCaseArgs(mode=mode, fast=args.fast, minimum_version=args.minimum_version)
 

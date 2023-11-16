@@ -1,6 +1,6 @@
-# Pyink Changelog
+# Verde Changelog
 
-All notable changes to Pyink are recorded here.
+All notable changes to Verde are recorded here.
 
 ## Unreleased
 
@@ -16,7 +16,7 @@ This release is based on _Black_ v23.9.1.
 
 * _Black_ v23.9.9's new concise formatting for dummy implementations from
   [psf/black#3796](https://github.com/psf/black/pull/3796) is temporarily
-  disabled for _Pyink_.
+  disabled for _Verde_.
 
 ## 23.5.0
 
@@ -25,7 +25,7 @@ This release is based on _Black_ v23.9.1.
   https://github.com/psf/black/pull/3640 where we still want to keep the
   parentheses around the implicitly concatenated strings if the code already
   uses them, making it more obvious it's a single function argument.
-* `--pyink-lines=` now works with stdin inputs (#16).
+* `--verde-lines=` now works with stdin inputs (#16).
 * Fixed compatibility issue on Python 3.7 (#13).
 
 ## 23.3.1
@@ -37,7 +37,7 @@ This release is based on _Black_ v23.9.1.
 
 This release is based on _Black_ v23.3.0.
 
-* _Pyink_ now requires _Black_ v23.3.0 (for blib2to3).
+* _Verde_ now requires _Black_ v23.3.0 (for blib2to3).
 
 ## 23.1.1
 
@@ -45,7 +45,7 @@ This release is based on https://github.com/psf/black/commit/9c8464ca7ddd48d1c19
 
 * Fixed a bug where a module docstring ends with a line that's `LineLength-3`
   to `LineLength` long, an extra empty line was added.
-* Fixed a bug when running *Pyink* on Python 3.8 and earlier (#3).
+* Fixed a bug when running *Verde* on Python 3.8 and earlier (#3).
 * Do not explode immediately nested literals that have a trailing comma in the
   body.
 
@@ -56,9 +56,9 @@ This release is based on _Black_ v23.1.0.
 * Temporarily disabled the following _Black_ future style changes:
     * https://github.com/psf/black/pull/2916
     * https://github.com/psf/black/pull/2278
-* Fixed a bug in incremental formatting (`--pyink_lines=`) where pairs of
+* Fixed a bug in incremental formatting (`--verde_lines=`) where pairs of
   `# fmt: off/on` are used outside of the line ranges.
-* Fixed a bug in incremental formatting (`--pyink_lines=`) when part of the
+* Fixed a bug in incremental formatting (`--verde_lines=`) when part of the
   match statement is changed.
 
 ## 22.12.0

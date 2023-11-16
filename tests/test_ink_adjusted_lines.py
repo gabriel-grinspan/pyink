@@ -1,6 +1,6 @@
 """Test the ink_adjusted_lines module."""
 
-from pyink import ink_adjusted_lines
+from verde import ink_adjusted_lines
 import pytest
 
 

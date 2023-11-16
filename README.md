@@ -1,34 +1,34 @@
-*Pyink*, pronounced pī-ˈiŋk, is a Python formatter, forked from
+*Verde*, pronounced pī-ˈiŋk, is a Python formatter, forked from
 *[Black](https://github.com/psf/black)* with a few different formatting
 behaviors. We intend to keep rebasing on top of *Black*'s latest changes.
 
-# Why *Pyink*?
+# Why *Verde*?
 
 We would love to adopt *Black*, but adopting it overnight is too disruptive to
 the thousands of developers working in our monorepo. We also have other Python
 tooling that assumes certain formatting, it would be a too big task to update
 them all at once. We decided to maintain a few local patches to *Black* as a
-medium-term solution, and release them as a separate tool called *Pyink*.
+medium-term solution, and release them as a separate tool called *Verde*.
 
-*Pyink* is intended to be an adoption helper, and we wish to remove as many
+*Verde* is intended to be an adoption helper, and we wish to remove as many
 patches as possible in the future.
 
 # What are the main differences?
 
-*   Support only formatting selected line ranges, using the `--pyink-lines=`
+*   Support only formatting selected line ranges, using the `--verde-lines=`
     argument (see [psf/black#830](https://github.com/psf/black/issues/830)).
 
-*   Support two-space indentation, using the `pyink-indentation` option.
+*   Support two-space indentation, using the `verde-indentation` option.
 
 *   Support inferring preferred quote style by calculating the majority in a
-    file, using the `pyink-use-majority-quotes` option.
+    file, using the `verde-use-majority-quotes` option.
 
 *   Do not wrap trailing pragma comments if the line exceeds the length only
     because of the pragma (see
     [psf/black#2843](https://github.com/psf/black/issues/2843)). Example
 
     ```python
-    # Pyink:
+    # Verde:
     result = some_other_module._private_function(arg="value")  # pylint: disable=protected-access
 
     # Black:
@@ -41,7 +41,7 @@ patches as possible in the future.
     [psf/black#3324](https://github.com/psf/black/issues/3324)). Example:
 
     ```python
-    # Pyink:
+    # Verde:
     from very_long_top_level_package_name.sub_package.another_level import a_long_module
 
     # Black:
@@ -54,7 +54,7 @@ patches as possible in the future.
     [psf/black#1811](https://github.com/psf/black/issues/1811)). Example:
 
     ```python
-    # Pyink:
+    # Verde:
     secrets = frozenset({
         1001,
         1002,
@@ -84,11 +84,11 @@ patches as possible in the future.
     ```
 
 *   Add an empty line between class statements without docstrings, and the first
-    method. We expect we will simply remove this difference from *Pyink* at some
+    method. We expect we will simply remove this difference from *Verde* at some
     point. Example:
 
     ```python
-    # Pyink:
+    # Verde:
     class MyTest(unittest.TestCase):
 
         def test_magic(self):
@@ -125,7 +125,7 @@ patches as possible in the future.
         " lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor",
     )
 
-    # Pyink:
+    # Verde:
     func1(
         (
             " lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor"
@@ -200,35 +200,35 @@ These are differences that existed in the past. We have upstreamed them to
     ] = some_long_expression_causing_long_line
     ```
 
-# How do I use *Pyink*?
+# How do I use *Verde*?
 
-Same as `black`, except you'll use `pyink`. All `black` command line options are
-supported by `pyink`. To configure the options in the `pyproject.toml` file, you
-need to put them in the `[tool.pyink]` section instead of `[tool.black]`.
+Same as `black`, except you'll use `verde`. All `black` command line options are
+supported by `verde`. To configure the options in the `pyproject.toml` file, you
+need to put them in the `[tool.verde]` section instead of `[tool.black]`.
 
-There are also a few *Pyink* only options:
+There are also a few *Verde* only options:
 
 ```
-  --pyink / --no-pyink            Enable the Pyink formatting mode. Disabling
+  --verde / --no-verde            Enable the Verde formatting mode. Disabling
                                   it should behave the same as Black.
-                                  [default: pyink]
-  --pyink-indentation [2|4]       The number of spaces used for indentation.
+                                  [default: verde]
+  --verde-indentation [2|4]       The number of spaces used for indentation.
                                   [default: 4]
-  --pyink-lines START-END         Range of lines to format. Must be specified
+  --verde-lines START-END         Range of lines to format. Must be specified
                                   as "START-END", index is 1-based and
                                   inclusive on both ends.
-  --pyink-use-majority-quotes     When normalizing string quotes, infer
+  --verde-use-majority-quotes     When normalizing string quotes, infer
                                   preferred quote style by calculating the
                                   majority in the file. Multi-line strings and
                                   docstrings are excluded from this as they
                                   always use double quotes.
 ```
 
-## Is there a VS Code extension for *Pyink*?
+## Is there a VS Code extension for *Verde*?
 
 No, but with a bit workaround, you can use the
 [Black Formatter](https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter)
-extension. After installing *Pyink* and the extension, you can set these in VS
+extension. After installing *Verde* and the extension, you can set these in VS
 Code's `settings.json`:
 
 ```json
@@ -237,21 +237,21 @@ Code's `settings.json`:
         "editor.defaultFormatter": "ms-python.black-formatter"
     },
     "black-formatter.path": [
-        "path/to/pyink"
+        "path/to/verde"
     ]
 }
 ```
 
-## Can I use *Pyink* with the [pre-commit](https://pre-commit.com/) framework?
+## Can I use *Verde* with the [pre-commit](https://pre-commit.com/) framework?
 
 Yes! You can put the following in your `.pre-commit-config.yaml` file:
 
 ```yaml
 repos:
-  - repo: https://github.com/google/pyink
+  - repo: https://github.com/google/verde
     rev: 23.3.0
     hooks:
-      - id: pyink
+      - id: verde
         # It is recommended to specify the latest version of Python
         # supported by your project here, or alternatively use
         # pre-commit's default_language_version, see

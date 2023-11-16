@@ -1,3 +1,0 @@
-[tool.black]
-pyink = true
-pyink-indentation = 2
