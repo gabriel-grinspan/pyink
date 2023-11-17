@@ -4,6 +4,14 @@ behaviors. We intend to keep rebasing on top of *Black*'s latest changes.
 
 # Why *Verde*?
 
+I stole this from Google, they did great work making *Black* better. I just
+wanted to prefer single quotes, so I forked and changed a line. All of Google's
+*PyInk* features are still working, including `pyink-use-majority-quotes`, I
+just renamed everything because I'm selfish and needed to feel special.
+
+Below is the rest of the README, courtesy of Google:
+---
+
 We would love to adopt *Black*, but adopting it overnight is too disruptive to
 the thousands of developers working in our monorepo. We also have other Python
 tooling that assumes certain formatting, it would be a too big task to update
