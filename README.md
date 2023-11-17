@@ -1,6 +1,6 @@
-*Verde*, pronounced pī-ˈiŋk, is a Python formatter, forked from
-*[Black](https://github.com/psf/black)* with a few different formatting
-behaviors. We intend to keep rebasing on top of *Black*'s latest changes.
+*Verde* is a Python formatter, forked from
+*[PyInk](https://github.com/google/pyink)* with a few different formatting
+behaviors. We intend to keep rebasing on top of *PyInk*'s latest changes.
 
 # Why *Verde*?
 
