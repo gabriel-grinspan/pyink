@@ -18,14 +18,14 @@ from verde.output import diff, err, out
 
 from . import conftest
 
-PYTHON_SUFFIX = ".py"
-ALLOWED_SUFFIXES = (PYTHON_SUFFIX, ".pyi", ".out", ".diff", ".ipynb")
+PYTHON_SUFFIX = '.py'
+ALLOWED_SUFFIXES = (PYTHON_SUFFIX, '.pyi', '.out', '.diff', '.ipynb')
 
 THIS_DIR = Path(__file__).parent
-DATA_DIR = THIS_DIR / "data"
+DATA_DIR = THIS_DIR / 'data'
 PROJECT_ROOT = THIS_DIR.parent
-EMPTY_LINE = "# EMPTY LINE WITH WHITESPACE" + " (this comment will be removed)"
-DETERMINISTIC_HEADER = "[Deterministic header]"
+EMPTY_LINE = '# EMPTY LINE WITH WHITESPACE' + ' (this comment will be removed)'
+DETERMINISTIC_HEADER = '[Deterministic header]'
 
 PY36_VERSIONS = {
     TargetVersion.PY36,
@@ -49,35 +49,35 @@ class TestCaseArgs:
 def _assert_format_equal(expected: str, actual: str) -> None:
     if actual != expected and (conftest.PRINT_FULL_TREE or conftest.PRINT_TREE_DIFF):
         bdv: DebugVisitor[Any]
-        actual_out: str = ""
-        expected_out: str = ""
+        actual_out: str = ''
+        expected_out: str = ''
         if conftest.PRINT_FULL_TREE:
-            out("Expected tree:", fg="green")
+            out('Expected tree:', fg='green')
         try:
             exp_node = verde.lib2to3_parse(expected)
             bdv = DebugVisitor(print_output=conftest.PRINT_FULL_TREE)
             list(bdv.visit(exp_node))
-            expected_out = "\n".join(bdv.list_output)
+            expected_out = '\n'.join(bdv.list_output)
         except Exception as ve:
             err(str(ve))
         if conftest.PRINT_FULL_TREE:
-            out("Actual tree:", fg="red")
+            out('Actual tree:', fg='red')
         try:
             exp_node = verde.lib2to3_parse(actual)
             bdv = DebugVisitor(print_output=conftest.PRINT_FULL_TREE)
             list(bdv.visit(exp_node))
-            actual_out = "\n".join(bdv.list_output)
+            actual_out = '\n'.join(bdv.list_output)
         except Exception as ve:
             err(str(ve))
         if conftest.PRINT_TREE_DIFF:
-            out("Tree Diff:")
+            out('Tree Diff:')
             out(
-                diff(expected_out, actual_out, "expected tree", "actual tree")
-                or "Trees do not differ"
+                diff(expected_out, actual_out, 'expected tree', 'actual tree')
+                or 'Trees do not differ'
             )
 
     if actual != expected:
-        out(diff(expected, actual, "expected", "actual"))
+        out(diff(expected, actual, 'expected', 'actual'))
 
     assert actual == expected
 
@@ -115,9 +115,9 @@ def assert_format(
             minimum_version=minimum_version,
         )
     except Exception as e:
-        text = "non-preview" if mode.preview else "preview"
+        text = 'non-preview' if mode.preview else 'preview'
         raise FormatFailure(
-            f"Black crashed formatting this case in {text} mode."
+            f'Black crashed formatting this case in {text} mode.'
         ) from e
     # Similarly, setting line length to 1 is a good way to catch
     # stability bugs. But only in non-preview mode because preview mode
@@ -132,7 +132,7 @@ def assert_format(
         )
     except Exception as e:
         raise FormatFailure(
-            "Black crashed formatting this case with line-length set to 1."
+            'Black crashed formatting this case with line-length set to 1.'
         ) from e
 
 
@@ -160,7 +160,7 @@ def _assert_format_inner(
 
 
 def dump_to_stderr(*output: str) -> str:
-    return "\n" + "\n".join(output) + "\n"
+    return '\n' + '\n'.join(output) + '\n'
 
 
 class BlackBaseTestCase(unittest.TestCase):
@@ -185,7 +185,7 @@ def get_case_path(
     case_path = get_base_dir(data) / subdir_name / name
     if not name.endswith(ALLOWED_SUFFIXES):
         case_path = case_path.with_suffix(suffix)
-    assert case_path.is_file(), f"{case_path} is not a file."
+    assert case_path.is_file(), f'{case_path} is not a file.'
     return case_path
 
 
@@ -203,7 +203,7 @@ def read_data(subdir_name: str, name: str, data: bool = True) -> Tuple[str, str]
 
 
 def _parse_minimum_version(version: str) -> Tuple[int, int]:
-    major, minor = version.split(".")
+    major, minor = version.split('.')
     return int(major), int(minor)
 
 
@@ -211,36 +211,36 @@ def _parse_minimum_version(version: str) -> Tuple[int, int]:
 def get_flags_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--target-version",
-        action="append",
+        '--target-version',
+        action='append',
         type=lambda val: TargetVersion[val.upper()],
         default=(),
     )
-    parser.add_argument("--line-length", default=DEFAULT_LINE_LENGTH, type=int)
+    parser.add_argument('--line-length', default=DEFAULT_LINE_LENGTH, type=int)
     parser.add_argument(
-        "--skip-string-normalization", default=False, action="store_true"
+        '--skip-string-normalization', default=False, action='store_true'
     )
-    parser.add_argument("--pyi", default=False, action="store_true")
-    parser.add_argument("--ipynb", default=False, action="store_true")
+    parser.add_argument('--pyi', default=False, action='store_true')
+    parser.add_argument('--ipynb', default=False, action='store_true')
     parser.add_argument(
-        "--skip-magic-trailing-comma", default=False, action="store_true"
+        '--skip-magic-trailing-comma', default=False, action='store_true'
     )
-    parser.add_argument("--preview", default=False, action="store_true")
-    parser.add_argument("--fast", default=False, action="store_true")
+    parser.add_argument('--preview', default=False, action='store_true')
+    parser.add_argument('--fast', default=False, action='store_true')
     parser.add_argument(
-        "--minimum-version",
+        '--minimum-version',
         type=_parse_minimum_version,
         default=None,
         help=(
-            "Minimum version of Python where this test case is parseable. If this is"
-            " set, the test case will be run twice: once with the specified"
-            " --target-version, and once with --target-version set to exactly the"
+            'Minimum version of Python where this test case is parseable. If this is'
+            ' set, the test case will be run twice: once with the specified'
+            ' --target-version, and once with --target-version set to exactly the'
             " specified version. This ensures that Black's autodetection of the target"
-            " version works correctly."
+            ' version works correctly.'
         ),
     )
-    parser.add_argument("--verde", default=False, action="store_true")
-    parser.add_argument("--verde-indentation", default=4, type=int, choices=[2, 4])
+    parser.add_argument('--verde', default=False, action='store_true')
+    parser.add_argument('--verde-indentation', default=4, type=int, choices=[2, 4])
     return parser
 
 
@@ -262,18 +262,18 @@ def parse_mode(flags_line: str) -> TestCaseArgs:
 
 
 def read_data_from_file(file_name: Path) -> Tuple[TestCaseArgs, str, str]:
-    with open(file_name, "r", encoding="utf8") as test:
+    with open(file_name, 'r', encoding='utf8') as test:
         lines = test.readlines()
     _input: List[str] = []
     _output: List[str] = []
     result = _input
     mode = TestCaseArgs()
     for line in lines:
-        if not _input and line.startswith("# flags: "):
-            mode = parse_mode(line[len("# flags: ") :])
+        if not _input and line.startswith('# flags: '):
+            mode = parse_mode(line[len('# flags: ') :])
             continue
-        line = line.replace(EMPTY_LINE, "")
-        if line.rstrip() == "# output":
+        line = line.replace(EMPTY_LINE, '')
+        if line.rstrip() == '# output':
             result = _output
             continue
 
@@ -281,17 +281,17 @@ def read_data_from_file(file_name: Path) -> Tuple[TestCaseArgs, str, str]:
     if _input and not _output:
         # If there's no output marker, treat the entire file as already pre-formatted.
         _output = _input[:]
-    return mode, "".join(_input).strip() + "\n", "".join(_output).strip() + "\n"
+    return mode, ''.join(_input).strip() + '\n', ''.join(_output).strip() + '\n'
 
 
 def read_jupyter_notebook(subdir_name: str, name: str, data: bool = True) -> str:
     return read_jupyter_notebook_from_file(
-        get_case_path(subdir_name, name, data, suffix=".ipynb")
+        get_case_path(subdir_name, name, data, suffix='.ipynb')
     )
 
 
 def read_jupyter_notebook_from_file(file_name: Path) -> str:
-    with open(file_name, mode="rb") as fd:
+    with open(file_name, mode='rb') as fd:
         content_bytes = fd.read()
     return content_bytes.decode()
 

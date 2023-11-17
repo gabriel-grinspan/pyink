@@ -5,7 +5,7 @@ import pytest
 
 
 @pytest.mark.parametrize(
-    "lines",
+    'lines',
     [[(1, 1)], [(1, 3)], [(1, 1), (3, 4)]],
 )
 def test_no_diff(lines):
@@ -19,7 +19,7 @@ pass
 
 
 @pytest.mark.parametrize(
-    "lines",
+    'lines',
     [
         [(1, 0)],
         [(-8, 0)],
@@ -61,7 +61,7 @@ pass
 
 
 @pytest.mark.parametrize(
-    "lines,adjusted_lines",
+    'lines,adjusted_lines',
     [
         (
             [(1, 1)],
@@ -100,7 +100,7 @@ def test_removals(lines, adjusted_lines):
 
 
 @pytest.mark.parametrize(
-    "lines,adjusted_lines",
+    'lines,adjusted_lines',
     [
         (
             [(1, 1)],
@@ -135,7 +135,7 @@ this is added
 
 
 @pytest.mark.parametrize(
-    "lines,adjusted_lines",
+    'lines,adjusted_lines',
     [
         (
             [(1, 11)],

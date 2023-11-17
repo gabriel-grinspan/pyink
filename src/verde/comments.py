@@ -18,10 +18,10 @@ from blib2to3.pytree import Leaf, Node
 # types
 LN = Union[Leaf, Node]
 
-FMT_OFF: Final = {"# fmt: off", "# fmt:off", "# yapf: disable"}
-FMT_SKIP: Final = {"# fmt: skip", "# fmt:skip"}
+FMT_OFF: Final = {'# fmt: off', '# fmt:off', '# yapf: disable'}
+FMT_SKIP: Final = {'# fmt: skip', '# fmt:skip'}
 FMT_PASS: Final = {*FMT_OFF, *FMT_SKIP}
-FMT_ON: Final = {"# fmt: on", "# fmt:on", "# yapf: enable"}
+FMT_ON: Final = {'# fmt: on', '# fmt:on', '# yapf: enable'}
 
 COMMENT_EXCEPTIONS = " !:#'"
 
@@ -64,29 +64,29 @@ def generate_comments(leaf: LN) -> Iterator[Leaf]:
     are emitted with a fake STANDALONE_COMMENT token identifier.
     """
     for pc in list_comments(leaf.prefix, is_endmarker=leaf.type == token.ENDMARKER):
-        yield Leaf(pc.type, pc.value, prefix="\n" * pc.newlines)
+        yield Leaf(pc.type, pc.value, prefix='\n' * pc.newlines)
 
 
 @lru_cache(maxsize=4096)
 def list_comments(prefix: str, *, is_endmarker: bool) -> List[ProtoComment]:
     """Return a list of :class:`ProtoComment` objects parsed from the given `prefix`."""
     result: List[ProtoComment] = []
-    if not prefix or "#" not in prefix:
+    if not prefix or '#' not in prefix:
         return result
 
     consumed = 0
     nlines = 0
     ignored_lines = 0
-    for index, line in enumerate(re.split("\r?\n", prefix)):
+    for index, line in enumerate(re.split('\r?\n', prefix)):
         consumed += len(line) + 1  # adding the length of the split '\n'
         line = line.lstrip()
         if not line:
             nlines += 1
-        if not line.startswith("#"):
+        if not line.startswith('#'):
             # Escaped newlines outside of a comment are not really newlines at
             # all. We treat a single-line comment following an escaped newline
             # as a simple trailing comment.
-            if line.endswith("\\"):
+            if line.endswith('\\'):
                 ignored_lines += 1
             continue
 
@@ -114,20 +114,20 @@ def make_comment(content: str) -> str:
     """
     content = content.rstrip()
     if not content:
-        return "#"
+        return '#'
 
-    if content[0] == "#":
+    if content[0] == '#':
         content = content[1:]
-    NON_BREAKING_SPACE = " "
+    NON_BREAKING_SPACE = ' '
     if (
         content
         and content[0] == NON_BREAKING_SPACE
-        and not content.lstrip().startswith("type:")
+        and not content.lstrip().startswith('type:')
     ):
-        content = " " + content[1:]  # Replace NBSP by a simple space
+        content = ' ' + content[1:]  # Replace NBSP by a simple space
     if content and content[0] not in COMMENT_EXCEPTIONS:
-        content = " " + content
-    return "#" + content
+        content = ' ' + content
+    return '#' + content
 
 
 def normalize_fmt_off(node: Node) -> None:
@@ -169,18 +169,18 @@ def convert_one_fmt_off_pair(node: Node) -> bool:
             if comment.value in FMT_OFF:
                 first.prefix = prefix[comment.consumed :]
             if comment.value in FMT_SKIP:
-                first.prefix = ""
+                first.prefix = ''
                 standalone_comment_prefix = prefix
             else:
                 standalone_comment_prefix = (
-                    prefix[:previous_consumed] + "\n" * comment.newlines
+                    prefix[:previous_consumed] + '\n' * comment.newlines
                 )
-            hidden_value = "".join(str(n) for n in ignored_nodes)
+            hidden_value = ''.join(str(n) for n in ignored_nodes)
             if comment.value in FMT_OFF:
-                hidden_value = comment.value + "\n" + hidden_value
+                hidden_value = comment.value + '\n' + hidden_value
             if comment.value in FMT_SKIP:
-                hidden_value += "  " + comment.value
-            if hidden_value.endswith("\n"):
+                hidden_value += '  ' + comment.value
+            if hidden_value.endswith('\n'):
                 # That happens when one of the `ignored_nodes` ended with a NEWLINE
                 # leaf (possibly followed by a DEDENT).
                 hidden_value = hidden_value[:-1]
@@ -189,8 +189,8 @@ def convert_one_fmt_off_pair(node: Node) -> bool:
                 index = ignored.remove()
                 if first_idx is None:
                     first_idx = index
-            assert parent is not None, "INTERNAL ERROR: fmt: on/off handling (1)"
-            assert first_idx is not None, "INTERNAL ERROR: fmt: on/off handling (2)"
+            assert parent is not None, 'INTERNAL ERROR: fmt: on/off handling (1)'
+            assert first_idx is not None, 'INTERNAL ERROR: fmt: on/off handling (2)'
             parent.insert_child(
                 first_idx,
                 Leaf(
@@ -262,9 +262,9 @@ def _generate_ignored_nodes_from_fmt_skip(
     if not comments or comment.value != comments[0].value:
         return
     if prev_sibling is not None:
-        leaf.prefix = ""
+        leaf.prefix = ''
         siblings = [prev_sibling]
-        while "\n" not in prev_sibling.prefix and prev_sibling.prev_sibling is not None:
+        while '\n' not in prev_sibling.prefix and prev_sibling.prev_sibling is not None:
             prev_sibling = prev_sibling.prev_sibling
             siblings.insert(0, prev_sibling)
         yield from siblings
@@ -274,7 +274,7 @@ def _generate_ignored_nodes_from_fmt_skip(
         # The `# fmt: skip` is on the colon line of the if/while/def/class/...
         # statements. The ignored nodes should be previous siblings of the
         # parent suite node.
-        leaf.prefix = ""
+        leaf.prefix = ''
         ignored_nodes: List[LN] = []
         parent_sibling = parent.prev_sibling
         while parent_sibling is not None and parent_sibling.type != syms.suite:
@@ -323,7 +323,7 @@ def contains_pragma_comment(comment_list: List[Leaf]) -> bool:
         pylint).
     """
     for comment in comment_list:
-        if comment.value.startswith(("# type:", "# noqa", "# pylint:")):
+        if comment.value.startswith(('# type:', '# noqa', '# pylint:')):
             return True
 
     return False

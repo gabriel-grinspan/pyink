@@ -24,7 +24,7 @@ syms: Final = pygram.python_symbols
 
 
 # types
-T = TypeVar("T")
+T = TypeVar('T')
 LN = Union[Leaf, Node]
 LeafID = int
 NodeType = int
@@ -44,8 +44,8 @@ STATEMENT: Final = {
     syms.case_block,
 }
 STANDALONE_COMMENT: Final = 153
-token.tok_name[STANDALONE_COMMENT] = "STANDALONE_COMMENT"
-LOGIC_OPERATORS: Final = {"and", "or"}
+token.tok_name[STANDALONE_COMMENT] = 'STANDALONE_COMMENT'
+LOGIC_OPERATORS: Final = {'and', 'or'}
 COMPARATORS: Final = {
     token.LESS,
     token.GREATER,
@@ -107,20 +107,20 @@ TEST_DESCENDANTS: Final = {
 }
 TYPED_NAMES: Final = {syms.tname, syms.tname_star}
 ASSIGNMENTS: Final = {
-    "=",
-    "+=",
-    "-=",
-    "*=",
-    "@=",
-    "/=",
-    "%=",
-    "&=",
-    "|=",
-    "^=",
-    "<<=",
-    ">>=",
-    "**=",
-    "//=",
+    '=',
+    '+=',
+    '-=',
+    '*=',
+    '@=',
+    '/=',
+    '%=',
+    '&=',
+    '|=',
+    '^=',
+    '<<=',
+    '>>=',
+    '**=',
+    '//=',
 }
 
 IMPLICIT_TUPLE: Final = {syms.testlist, syms.testlist_star_expr, syms.exprlist}
@@ -159,7 +159,7 @@ class Visitor(Generic[T]):
         # using self.visit_default as the default arg to getattr) in order
         # to save needing to create a bound method object and so mypyc can
         # generate a native call to visit_default.
-        visitf = getattr(self, f"visit_{name}", None)
+        visitf = getattr(self, f'visit_{name}', None)
         if visitf:
             yield from visitf(node)
         else:
@@ -178,9 +178,9 @@ def whitespace(leaf: Leaf, *, complex_subscript: bool, mode: Mode) -> str:  # no
     `complex_subscript` signals whether the given leaf is part of a subscription
     which has non-trivial arguments, like arithmetic expressions or function calls.
     """
-    NO: Final[str] = ""
-    SPACE: Final[str] = " "
-    DOUBLESPACE: Final[str] = "  "
+    NO: Final[str] = ''
+    SPACE: Final[str] = ' '
+    DOUBLESPACE: Final[str] = '  '
     t = leaf.type
     p = leaf.parent
     v = leaf.value
@@ -190,7 +190,7 @@ def whitespace(leaf: Leaf, *, complex_subscript: bool, mode: Mode) -> str:  # no
     if t == token.COMMENT:
         return DOUBLESPACE
 
-    assert p is not None, f"INTERNAL ERROR: hand-made leaf without parent: {leaf!r}"
+    assert p is not None, f'INTERNAL ERROR: hand-made leaf without parent: {leaf!r}'
     if t == token.COLON and p.type not in {
         syms.subscript,
         syms.subscriptlist,
@@ -340,7 +340,7 @@ def whitespace(leaf: Leaf, *, complex_subscript: bool, mode: Mode) -> str:  # no
     elif p.type in {syms.subscript, syms.sliceop}:
         # indexing
         if not prev:
-            assert p.parent is not None, "subscripts are always parented"
+            assert p.parent is not None, 'subscripts are always parented'
             if p.parent.type == syms.subscriptlist:
                 return SPACE
 
@@ -391,7 +391,7 @@ def whitespace(leaf: Leaf, *, complex_subscript: bool, mode: Mode) -> str:  # no
                 return NO
 
         elif t == token.NAME:
-            if v == "import":
+            if v == 'import':
                 return SPACE
 
             if prev and prev.type == token.DOT:
@@ -602,7 +602,7 @@ def is_one_sequence_between(
             break
 
     else:
-        raise LookupError("Opening paren not found in `leaves`")
+        raise LookupError('Opening paren not found in `leaves`')
 
     commas = 0
     _opening_index += 1
@@ -684,7 +684,7 @@ def is_yield(node: LN) -> bool:
     if node.type == syms.yield_expr:
         return True
 
-    if is_name_token(node) and node.value == "yield":
+    if is_name_token(node) and node.value == 'yield':
         return True
 
     if node.type != syms.atom:
@@ -725,7 +725,7 @@ def is_vararg(leaf: Leaf, within: Set[NodeType]) -> bool:
 
 def is_multiline_string(leaf: Leaf) -> bool:
     """Return True if `leaf` is a multiline string that actually spans many lines."""
-    return has_triple_quotes(leaf.value) and "\n" in leaf.value
+    return has_triple_quotes(leaf.value) and '\n' in leaf.value
 
 
 def is_stub_suite(node: Node) -> bool:
@@ -762,7 +762,7 @@ def is_stub_body(node: LN) -> bool:
         not child.prefix.strip()
         and child.type == syms.atom
         and len(child.children) == 3
-        and all(leaf == Leaf(token.DOT, ".") for leaf in child.children)
+        and all(leaf == Leaf(token.DOT, '.') for leaf in child.children)
     )
 
 
@@ -777,10 +777,10 @@ def is_atom_with_invisible_parens(node: LN) -> bool:
     return (
         isinstance(first, Leaf)
         and first.type == token.LPAR
-        and first.value == ""
+        and first.value == ''
         and isinstance(last, Leaf)
         and last.type == token.RPAR
-        and last.value == ""
+        and last.value == ''
     )
 
 
@@ -789,11 +789,11 @@ def is_empty_par(leaf: Leaf) -> bool:
 
 
 def is_empty_lpar(leaf: Leaf) -> bool:
-    return leaf.type == token.LPAR and leaf.value == ""
+    return leaf.type == token.LPAR and leaf.value == ''
 
 
 def is_empty_rpar(leaf: Leaf) -> bool:
-    return leaf.type == token.RPAR and leaf.value == ""
+    return leaf.type == token.RPAR and leaf.value == ''
 
 
 def is_import(leaf: Leaf) -> bool:
@@ -804,8 +804,8 @@ def is_import(leaf: Leaf) -> bool:
     return bool(
         t == token.NAME
         and (
-            (v == "import" and p and p.type == syms.import_name)
-            or (v == "from" and p and p.type == syms.import_from)
+            (v == 'import' and p and p.type == syms.import_name)
+            or (v == 'from' and p and p.type == syms.import_from)
         )
     )
 
@@ -814,7 +814,7 @@ def is_with_or_async_with_stmt(leaf: Leaf) -> bool:
     """Return True if the given leaf starts a with or async with statement."""
     return bool(
         leaf.type == token.NAME
-        and leaf.value == "with"
+        and leaf.value == 'with'
         and leaf.parent
         and leaf.parent.type == syms.with_stmt
     ) or bool(
@@ -844,7 +844,7 @@ def is_type_comment(leaf: Leaf) -> bool:
     used in modern version of Python, this function may be deprecated in the future."""
     t = leaf.type
     v = leaf.value
-    return t in {token.COMMENT, STANDALONE_COMMENT} and v.startswith("# type:")
+    return t in {token.COMMENT, STANDALONE_COMMENT} and v.startswith('# type:')
 
 
 def is_type_ignore_comment(leaf: Leaf) -> bool:
@@ -857,7 +857,7 @@ def is_type_ignore_comment(leaf: Leaf) -> bool:
 def is_type_ignore_comment_string(value: str) -> bool:
     """Return True if the given string match with type comment with
     ignore annotation."""
-    return value.startswith("# type: ignore")
+    return value.startswith('# type: ignore')
 
 
 def wrap_in_parentheses(parent: Node, child: LN, *, visible: bool = True) -> None:
@@ -868,10 +868,10 @@ def wrap_in_parentheses(parent: Node, child: LN, *, visible: bool = True) -> Non
 
     If `visible` is False, the leaves will be valueless (and thus invisible).
     """
-    lpar = Leaf(token.LPAR, "(" if visible else "")
-    rpar = Leaf(token.RPAR, ")" if visible else "")
+    lpar = Leaf(token.LPAR, '(' if visible else '')
+    rpar = Leaf(token.RPAR, ')' if visible else '')
     prefix = child.prefix
-    child.prefix = ""
+    child.prefix = ''
     index = child.remove() or 0
     new_child = Node(syms.atom, [lpar, child, rpar])
     new_child.prefix = prefix
@@ -899,9 +899,9 @@ def ensure_visible(leaf: Leaf) -> None:
     :func:`normalize_invisible_parens` and :func:`visit_import_from`).
     """
     if leaf.type == token.LPAR:
-        leaf.value = "("
+        leaf.value = '('
     elif leaf.type == token.RPAR:
-        leaf.value = ")"
+        leaf.value = ')'
 
 
 def is_name_token(nl: NL) -> TypeGuard[Leaf]:

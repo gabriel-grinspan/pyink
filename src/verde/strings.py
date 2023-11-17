@@ -11,18 +11,18 @@ from verde._width_table import WIDTH_TABLE
 from verde.mode import Quote
 from blib2to3.pytree import Leaf
 
-STRING_PREFIX_CHARS: Final = "furbFURB"  # All possible string prefix characters.
+STRING_PREFIX_CHARS: Final = 'furbFURB'  # All possible string prefix characters.
 STRING_PREFIX_RE: Final = re.compile(
-    r"^([" + STRING_PREFIX_CHARS + r"]*)(.*)$", re.DOTALL
+    r'^([' + STRING_PREFIX_CHARS + r']*)(.*)$', re.DOTALL
 )
-FIRST_NON_WHITESPACE_RE: Final = re.compile(r"\s*\t+\s*(\S)")
+FIRST_NON_WHITESPACE_RE: Final = re.compile(r'\s*\t+\s*(\S)')
 UNICODE_ESCAPE_RE: Final = re.compile(
-    r"(?P<backslashes>\\+)(?P<body>"
-    r"(u(?P<u>[a-fA-F0-9]{4}))"  # Character with 16-bit hex value xxxx
-    r"|(U(?P<U>[a-fA-F0-9]{8}))"  # Character with 32-bit hex value xxxxxxxx
-    r"|(x(?P<x>[a-fA-F0-9]{2}))"  # Character with hex value hh
-    r"|(N\{(?P<N>[a-zA-Z0-9 \-]{2,})\})"  # Character named name in the Unicode database
-    r")",
+    r'(?P<backslashes>\\+)(?P<body>'
+    r'(u(?P<u>[a-fA-F0-9]{4}))'  # Character with 16-bit hex value xxxx
+    r'|(U(?P<U>[a-fA-F0-9]{8}))'  # Character with 32-bit hex value xxxxxxxx
+    r'|(x(?P<x>[a-fA-F0-9]{2}))'  # Character with hex value hh
+    r'|(N\{(?P<N>[a-zA-Z0-9 \-]{2,})\})'  # Character named name in the Unicode database
+    r')',
     re.VERBOSE,
 )
 
@@ -70,7 +70,7 @@ def lines_with_leading_tabs_expanded(s: str) -> List[str]:
 def fix_docstring(docstring: str, prefix: str) -> str:
     # https://www.python.org/dev/peps/pep-0257/#handling-docstring-indentation
     if not docstring:
-        return ""
+        return ''
     lines = lines_with_leading_tabs_expanded(docstring)
     # Determine minimum indentation (first line doesn't count):
     indent = sys.maxsize
@@ -87,8 +87,8 @@ def fix_docstring(docstring: str, prefix: str) -> str:
             if stripped_line or i == last_line_idx:
                 trimmed.append(prefix + stripped_line)
             else:
-                trimmed.append("")
-    return "\n".join(trimmed)
+                trimmed.append('')
+    return '\n'.join(trimmed)
 
 
 def get_string_prefix(string: str) -> str:
@@ -101,7 +101,7 @@ def get_string_prefix(string: str) -> str:
     """
     assert_is_leaf_string(string)
 
-    prefix = ""
+    prefix = ''
     prefix_idx = 0
     while string[prefix_idx] in STRING_PREFIX_CHARS:
         prefix += string[prefix_idx]
@@ -135,32 +135,32 @@ def assert_is_leaf_string(string: str) -> None:
 
     assert (
         0 <= quote_idx < len(string) - 1
-    ), f"{string!r} is missing a starting quote character (' or \")."
+    ), f'{string!r} is missing a starting quote character (\' or ").'
     assert string[-1] in (
         "'",
         '"',
-    ), f"{string!r} is missing an ending quote character (' or \")."
+    ), f'{string!r} is missing an ending quote character (\' or ").'
     assert set(string[:quote_idx]).issubset(
         set(STRING_PREFIX_CHARS)
-    ), f"{set(string[:quote_idx])} is NOT a subset of {set(STRING_PREFIX_CHARS)}."
+    ), f'{set(string[:quote_idx])} is NOT a subset of {set(STRING_PREFIX_CHARS)}.'
 
 
 def normalize_string_prefix(s: str) -> str:
     """Make all string prefixes lowercase."""
     match = STRING_PREFIX_RE.match(s)
-    assert match is not None, f"failed to match string {s!r}"
+    assert match is not None, f'failed to match string {s!r}'
     orig_prefix = match.group(1)
     new_prefix = (
-        orig_prefix.replace("F", "f")
-        .replace("B", "b")
-        .replace("U", "")
-        .replace("u", "")
+        orig_prefix.replace('F', 'f')
+        .replace('B', 'b')
+        .replace('U', '')
+        .replace('u', '')
     )
 
     # Python syntax guarantees max 2 prefixes and that one of them is "r"
-    if len(new_prefix) == 2 and "r" != new_prefix[0].lower():
+    if len(new_prefix) == 2 and 'r' != new_prefix[0].lower():
         new_prefix = new_prefix[::-1]
-    return f"{new_prefix}{match.group(2)}"
+    return f'{new_prefix}{match.group(2)}'
 
 
 # Re(gex) does actually cache patterns internally but this still improves
@@ -197,11 +197,11 @@ def normalize_string_quotes(s: str, *, preferred_quote: Quote) -> str:
         return s  # There's an internal error
 
     prefix = s[:first_quote_pos]
-    unescaped_new_quote = _cached_compile(rf"(([^\\]|^)(\\\\)*){new_quote}")
-    escaped_new_quote = _cached_compile(rf"([^\\]|^)\\((?:\\\\)*){new_quote}")
-    escaped_orig_quote = _cached_compile(rf"([^\\]|^)\\((?:\\\\)*){orig_quote}")
+    unescaped_new_quote = _cached_compile(rf'(([^\\]|^)(\\\\)*){new_quote}')
+    escaped_new_quote = _cached_compile(rf'([^\\]|^)\\((?:\\\\)*){new_quote}')
+    escaped_orig_quote = _cached_compile(rf'([^\\]|^)\\((?:\\\\)*){orig_quote}')
     body = s[first_quote_pos + len(orig_quote) : -len(orig_quote)]
-    if "r" in prefix.casefold():
+    if 'r' in prefix.casefold():
         if unescaped_new_quote.search(body):
             # There's at least one unescaped new_quote in this raw string
             # so converting is impossible
@@ -211,14 +211,14 @@ def normalize_string_quotes(s: str, *, preferred_quote: Quote) -> str:
         new_body = body
     else:
         # remove unnecessary escapes
-        new_body = sub_twice(escaped_new_quote, rf"\1\2{new_quote}", body)
+        new_body = sub_twice(escaped_new_quote, rf'\1\2{new_quote}', body)
         if body != new_body:
             # Consider the string without unnecessary escapes as the original
             body = new_body
-            s = f"{prefix}{orig_quote}{body}{orig_quote}"
-        new_body = sub_twice(escaped_orig_quote, rf"\1\2{orig_quote}", new_body)
-        new_body = sub_twice(unescaped_new_quote, rf"\1\\{new_quote}", new_body)
-    if "f" in prefix.casefold():
+            s = f'{prefix}{orig_quote}{body}{orig_quote}'
+        new_body = sub_twice(escaped_orig_quote, rf'\1\2{orig_quote}', new_body)
+        new_body = sub_twice(unescaped_new_quote, rf'\1\\{new_quote}', new_body)
+    if 'f' in prefix.casefold():
         matches = re.findall(
             r"""
             (?:(?<!\{)|^)\{  # start of the string or a non-{ followed by a single {
@@ -229,51 +229,51 @@ def normalize_string_quotes(s: str, *, preferred_quote: Quote) -> str:
             re.VERBOSE,
         )
         for m in matches:
-            if "\\" in str(m):
+            if '\\' in str(m):
                 # Do not introduce backslashes in interpolated expressions
                 return s
 
     if new_quote == '"""' and new_body[-1:] == '"':
         # edge case:
         new_body = new_body[:-1] + '\\"'
-    orig_escape_count = body.count("\\")
-    new_escape_count = new_body.count("\\")
+    orig_escape_count = body.count('\\')
+    new_escape_count = new_body.count('\\')
     if new_escape_count > orig_escape_count:
         return s  # Do not introduce more escaping
 
     if new_escape_count == orig_escape_count and orig_quote == preferred_quote.value:
         return s  # Prefer `preferred_quote`.
 
-    return f"{prefix}{new_quote}{new_body}{new_quote}"
+    return f'{prefix}{new_quote}{new_body}{new_quote}'
 
 
 def normalize_unicode_escape_sequences(leaf: Leaf) -> None:
     """Replace hex codes in Unicode escape sequences with lowercase representation."""
     text = leaf.value
     prefix = get_string_prefix(text)
-    if "r" in prefix.lower():
+    if 'r' in prefix.lower():
         return
 
     def replace(m: Match[str]) -> str:
         groups = m.groupdict()
-        back_slashes = groups["backslashes"]
+        back_slashes = groups['backslashes']
 
         if len(back_slashes) % 2 == 0:
-            return back_slashes + groups["body"]
+            return back_slashes + groups['body']
 
-        if groups["u"]:
+        if groups['u']:
             # \u
-            return back_slashes + "u" + groups["u"].lower()
-        elif groups["U"]:
+            return back_slashes + 'u' + groups['u'].lower()
+        elif groups['U']:
             # \U
-            return back_slashes + "U" + groups["U"].lower()
-        elif groups["x"]:
+            return back_slashes + 'U' + groups['U'].lower()
+        elif groups['x']:
             # \x
-            return back_slashes + "x" + groups["x"].lower()
+            return back_slashes + 'x' + groups['x'].lower()
         else:
-            assert groups["N"], f"Unexpected match: {m}"
+            assert groups['N'], f'Unexpected match: {m}'
             # \N{}
-            return back_slashes + "N{" + groups["N"].upper() + "}"
+            return back_slashes + 'N{' + groups['N'].upper() + '}'
 
     leaf.value = re.sub(UNICODE_ESCAPE_RE, replace, text)
 

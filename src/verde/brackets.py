@@ -103,8 +103,8 @@ class BracketTracker:
                 opening_bracket = self.bracket_match.pop((self.depth, leaf.type))
             except KeyError as e:
                 raise BracketMatchError(
-                    "Unable to match a closing bracket to the following opening"
-                    f" bracket: {leaf}"
+                    'Unable to match a closing bracket to the following opening'
+                    f' bracket: {leaf}'
                 ) from e
             leaf.opening_bracket = opening_bracket
             if not leaf.value:
@@ -156,7 +156,7 @@ class BracketTracker:
         To avoid splitting on the comma in this situation, increase the depth of
         tokens between `for` and `in`.
         """
-        if leaf.type == token.NAME and leaf.value == "for":
+        if leaf.type == token.NAME and leaf.value == 'for':
             self.depth += 1
             self._for_loop_depths.append(self.depth)
             return True
@@ -169,7 +169,7 @@ class BracketTracker:
             self._for_loop_depths
             and self._for_loop_depths[-1] == self.depth
             and leaf.type == token.NAME
-            and leaf.value == "in"
+            and leaf.value == 'in'
         ):
             self.depth -= 1
             self._for_loop_depths.pop()
@@ -183,7 +183,7 @@ class BracketTracker:
         To avoid splitting on the comma in this situation, increase the depth of
         tokens between `lambda` and `:`.
         """
-        if leaf.type == token.NAME and leaf.value == "lambda":
+        if leaf.type == token.NAME and leaf.value == 'lambda':
             self.depth += 1
             self._lambda_argument_depths.append(self.depth)
             return True
@@ -264,50 +264,50 @@ def is_split_before_delimiter(leaf: Leaf, previous: Optional[Leaf] = None) -> Pr
         return 0
 
     if (
-        leaf.value == "for"
+        leaf.value == 'for'
         and leaf.parent
         and leaf.parent.type in {syms.comp_for, syms.old_comp_for}
         or leaf.type == token.ASYNC
     ):
         if (
             not isinstance(leaf.prev_sibling, Leaf)
-            or leaf.prev_sibling.value != "async"
+            or leaf.prev_sibling.value != 'async'
         ):
             return COMPREHENSION_PRIORITY
 
     if (
-        leaf.value == "if"
+        leaf.value == 'if'
         and leaf.parent
         and leaf.parent.type in {syms.comp_if, syms.old_comp_if}
     ):
         return COMPREHENSION_PRIORITY
 
-    if leaf.value in {"if", "else"} and leaf.parent and leaf.parent.type == syms.test:
+    if leaf.value in {'if', 'else'} and leaf.parent and leaf.parent.type == syms.test:
         return TERNARY_PRIORITY
 
-    if leaf.value == "is":
+    if leaf.value == 'is':
         return COMPARATOR_PRIORITY
 
     if (
-        leaf.value == "in"
+        leaf.value == 'in'
         and leaf.parent
         and leaf.parent.type in {syms.comp_op, syms.comparison}
         and not (
             previous is not None
             and previous.type == token.NAME
-            and previous.value == "not"
+            and previous.value == 'not'
         )
     ):
         return COMPARATOR_PRIORITY
 
     if (
-        leaf.value == "not"
+        leaf.value == 'not'
         and leaf.parent
         and leaf.parent.type == syms.comp_op
         and not (
             previous is not None
             and previous.type == token.NAME
-            and previous.value == "is"
+            and previous.value == 'is'
         )
     ):
         return COMPARATOR_PRIORITY

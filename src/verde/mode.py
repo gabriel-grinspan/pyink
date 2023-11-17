@@ -54,7 +54,7 @@ class Feature(Enum):
 
 
 FUTURE_FLAG_TO_FEATURE: Final = {
-    "annotations": Feature.FUTURE_ANNOTATIONS,
+    'annotations': Feature.FUTURE_ANNOTATIONS,
 }
 
 
@@ -203,9 +203,9 @@ class Quote(Enum):
     def cache_key(self) -> str:
         # On Windows, paths can't contain a double quote.
         if self == Quote.SINGLE:
-            return "0"
+            return '0'
         else:
-            return "1"
+            return '1'
 
 
 class QuoteStyle(Enum):
@@ -236,8 +236,8 @@ class Mode:
     def __post_init__(self) -> None:
         if self.experimental_string_processing:
             warn(
-                "`experimental string processing` has been included in `preview`"
-                " and deprecated. Use `preview` instead.",
+                '`experimental string processing` has been included in `preview`'
+                ' and deprecated. Use `preview` instead.',
                 Deprecated,
             )
 
@@ -257,12 +257,12 @@ class Mode:
 
     def get_cache_key(self) -> str:
         if self.target_versions:
-            version_str = ",".join(
+            version_str = ','.join(
                 str(version.value)
-                for version in sorted(self.target_versions, key=attrgetter("value"))
+                for version in sorted(self.target_versions, key=attrgetter('value'))
             )
         else:
-            version_str = "-"
+            version_str = '-'
         parts = [
             version_str,
             str(self.line_length),
@@ -277,9 +277,9 @@ class Mode:
             str(int(self.preview)),
             str(int(self.is_verde)),
             str(self.verde_indentation),
-            sha256((",".join(sorted(self.python_cell_magics))).encode()).hexdigest(),
+            sha256((','.join(sorted(self.python_cell_magics))).encode()).hexdigest(),
         ]
-        return ".".join(parts)
+        return '.'.join(parts)
 
     @property
     def preferred_quote(self) -> Quote:

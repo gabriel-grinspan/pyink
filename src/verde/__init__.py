@@ -84,7 +84,7 @@ from verde.trans import iter_fexpr_spans
 from blib2to3.pgen2 import token
 from blib2to3.pytree import Leaf, Node
 
-COMPILED = Path(__file__).suffix in (".pyd", ".so")
+COMPILED = Path(__file__).suffix in ('.pyd', '.so')
 
 # types
 FileContent = str
@@ -102,7 +102,7 @@ class WriteBack(Enum):
     @classmethod
     def from_configuration(
         cls, *, check: bool, diff: bool, color: bool = False
-    ) -> "WriteBack":
+    ) -> 'WriteBack':
         if check and not diff:
             return cls.CHECK
 
@@ -126,7 +126,7 @@ def read_pyproject_toml(
     """
     if not value:
         value = find_pyproject_toml(
-            ctx.params.get("src", ()), ctx.params.get("stdin_filename", None)
+            ctx.params.get('src', ()), ctx.params.get('stdin_filename', None)
         )
         if value is None:
             return None
@@ -135,7 +135,7 @@ def read_pyproject_toml(
         config = parse_pyproject_toml(value)
     except (OSError, ValueError) as e:
         raise click.FileError(
-            filename=value, hint=f"Error reading configuration file: {e}"
+            filename=value, hint=f'Error reading configuration file: {e}'
         ) from None
 
     if not config:
@@ -149,20 +149,20 @@ def read_pyproject_toml(
             for k, v in config.items()
         }
 
-    target_version = config.get("target_version")
+    target_version = config.get('target_version')
     if target_version is not None and not isinstance(target_version, list):
         raise click.BadOptionUsage(
-            "target-version", "Config key target-version must be a list"
+            'target-version', 'Config key target-version must be a list'
         )
 
-    exclude = config.get("exclude")
+    exclude = config.get('exclude')
     if exclude is not None and not isinstance(exclude, str):
-        raise click.BadOptionUsage("exclude", "Config key exclude must be a string")
+        raise click.BadOptionUsage('exclude', 'Config key exclude must be a string')
 
-    extend_exclude = config.get("extend_exclude")
+    extend_exclude = config.get('extend_exclude')
     if extend_exclude is not None and not isinstance(extend_exclude, str):
         raise click.BadOptionUsage(
-            "extend-exclude", "Config key extend-exclude must be a string"
+            'extend-exclude', 'Config key extend-exclude must be a string'
         )
 
     default_map: Dict[str, Any] = {}
@@ -190,8 +190,8 @@ def re_compile_maybe_verbose(regex: str) -> Pattern[str]:
 
     If it contains newlines, use verbose mode.
     """
-    if "\n" in regex:
-        regex = "(?x)" + regex
+    if '\n' in regex:
+        regex = '(?x)' + regex
     compiled: Pattern[str] = re.compile(regex)
     return compiled
 
@@ -204,262 +204,262 @@ def validate_regex(
     try:
         return re_compile_maybe_verbose(value) if value is not None else None
     except re.error as e:
-        raise click.BadParameter(f"Not a valid regular expression: {e}") from None
+        raise click.BadParameter(f'Not a valid regular expression: {e}') from None
 
 
 @click.command(
-    context_settings={"help_option_names": ["-h", "--help"]},
+    context_settings={'help_option_names': ['-h', '--help']},
     # While Click does set this field automatically using the docstring, mypyc
     # (annoyingly) strips 'em so we need to set it here too.
-    help="The uncompromising code formatter.",
+    help='The uncompromising code formatter.',
 )
-@click.option("-c", "--code", type=str, help="Format the code passed in as a string.")
+@click.option('-c', '--code', type=str, help='Format the code passed in as a string.')
 @click.option(
-    "-l",
-    "--line-length",
+    '-l',
+    '--line-length',
     type=int,
     default=DEFAULT_LINE_LENGTH,
-    help="How many characters per line to allow.",
+    help='How many characters per line to allow.',
     show_default=True,
 )
 @click.option(
-    "-t",
-    "--target-version",
+    '-t',
+    '--target-version',
     type=click.Choice([v.name.lower() for v in TargetVersion]),
     callback=target_version_option_callback,
     multiple=True,
     help=(
         "Python versions that should be supported by Black's output. By default, Black"
-        " will try to infer this from the project metadata in pyproject.toml. If this"
-        " does not yield conclusive results, Black will use per-file auto-detection."
+        ' will try to infer this from the project metadata in pyproject.toml. If this'
+        ' does not yield conclusive results, Black will use per-file auto-detection.'
     ),
 )
 @click.option(
-    "--pyi",
+    '--pyi',
     is_flag=True,
     help=(
-        "Format all input files like typing stubs regardless of file extension (useful"
-        " when piping source on standard input)."
+        'Format all input files like typing stubs regardless of file extension (useful'
+        ' when piping source on standard input).'
     ),
 )
 @click.option(
-    "--ipynb",
+    '--ipynb',
     is_flag=True,
     help=(
-        "Format all input files like Jupyter Notebooks regardless of file extension "
-        "(useful when piping source on standard input)."
+        'Format all input files like Jupyter Notebooks regardless of file extension '
+        '(useful when piping source on standard input).'
     ),
 )
 @click.option(
-    "--python-cell-magics",
+    '--python-cell-magics',
     multiple=True,
     help=(
-        "When processing Jupyter Notebooks, add the given magic to the list"
-        f" of known python-magics ({', '.join(sorted(PYTHON_CELL_MAGICS))})."
-        " Useful for formatting cells with custom python magics."
+        'When processing Jupyter Notebooks, add the given magic to the list'
+        f' of known python-magics ({", ".join(sorted(PYTHON_CELL_MAGICS))}).'
+        ' Useful for formatting cells with custom python magics.'
     ),
     default=[],
 )
 @click.option(
-    "-x",
-    "--skip-source-first-line",
+    '-x',
+    '--skip-source-first-line',
     is_flag=True,
-    help="Skip the first line of the source code.",
+    help='Skip the first line of the source code.',
 )
 @click.option(
-    "-S",
-    "--skip-string-normalization",
+    '-S',
+    '--skip-string-normalization',
     is_flag=True,
     help="Don't normalize string quotes or prefixes.",
 )
 @click.option(
-    "-C",
-    "--skip-magic-trailing-comma",
+    '-C',
+    '--skip-magic-trailing-comma',
     is_flag=True,
     help="Don't use trailing commas as a reason to split lines.",
 )
 @click.option(
-    "--experimental-string-processing",
+    '--experimental-string-processing',
     is_flag=True,
     hidden=True,
-    help="(DEPRECATED and now included in --preview) Normalize string literals.",
+    help='(DEPRECATED and now included in --preview) Normalize string literals.',
 )
 @click.option(
-    "--preview",
+    '--preview',
     is_flag=True,
     help=(
         "Enable potentially disruptive style changes that may be added to Black's main"
-        " functionality in the next major release."
+        ' functionality in the next major release.'
     ),
 )
 @click.option(
-    "--verde/--no-verde",
+    '--verde/--no-verde',
     is_flag=True,
     default=True,
     help=(
-        "Enable the Verde formatting mode. Disabling it should behave the same as"
-        " Black."
+        'Enable the Verde formatting mode. Disabling it should behave the same as'
+        ' Black.'
     ),
 )
 @click.option(
-    "--verde-indentation",
-    type=click.Choice(["2", "4"]),
-    default="4",
+    '--verde-indentation',
+    type=click.Choice(['2', '4']),
+    default='4',
     show_default=True,
-    help="The number of spaces used for indentation.",
+    help='The number of spaces used for indentation.',
 )
 @click.option(
-    "--verde-lines",
+    '--verde-lines',
     multiple=True,
-    metavar="START-END",
+    metavar='START-END',
     help=(
         'Range of lines to format. Must be specified as "START-END", index is'
-        " 1-based and inclusive on both ends."
+        ' 1-based and inclusive on both ends.'
     ),
     default=None,
 )
 @click.option(
-    "--verde-use-majority-quotes",
+    '--verde-use-majority-quotes',
     is_flag=True,
     help=(
-        "When normalizing string quotes, infer preferred quote style by calculating the"
-        " majority in the file. Multi-line strings and docstrings are excluded from"
-        " this as they always use double quotes."
+        'When normalizing string quotes, infer preferred quote style by calculating the'
+        ' majority in the file. Multi-line strings and docstrings are excluded from'
+        ' this as they always use double quotes.'
     ),
 )
 @click.option(
-    "--check",
+    '--check',
     is_flag=True,
     help=(
         "Don't write the files back, just return the status. Return code 0 means"
-        " nothing would change. Return code 1 means some files would be reformatted."
-        " Return code 123 means there was an internal error."
+        ' nothing would change. Return code 1 means some files would be reformatted.'
+        ' Return code 123 means there was an internal error.'
     ),
 )
 @click.option(
-    "--diff",
+    '--diff',
     is_flag=True,
     help="Don't write the files back, just output a diff for each file on stdout.",
 )
 @click.option(
-    "--color/--no-color",
+    '--color/--no-color',
     is_flag=True,
-    help="Show colored diff. Only applies when `--diff` is given.",
+    help='Show colored diff. Only applies when `--diff` is given.',
 )
 @click.option(
-    "--fast/--safe",
+    '--fast/--safe',
     is_flag=True,
-    help="If --fast given, skip temporary sanity checks. [default: --safe]",
+    help='If --fast given, skip temporary sanity checks. [default: --safe]',
 )
 @click.option(
-    "--required-version",
+    '--required-version',
     type=str,
     help=(
-        "Require a specific version of Black to be running (useful for unifying results"
-        " across many environments e.g. with a pyproject.toml file). It can be"
-        " either a major version number or an exact version."
+        'Require a specific version of Black to be running (useful for unifying results'
+        ' across many environments e.g. with a pyproject.toml file). It can be'
+        ' either a major version number or an exact version.'
     ),
 )
 @click.option(
-    "--include",
+    '--include',
     type=str,
     default=DEFAULT_INCLUDES,
     callback=validate_regex,
     help=(
-        "A regular expression that matches files and directories that should be"
-        " included on recursive searches. An empty value means all files are included"
-        " regardless of the name. Use forward slashes for directories on all platforms"
-        " (Windows, too). Exclusions are calculated first, inclusions later."
+        'A regular expression that matches files and directories that should be'
+        ' included on recursive searches. An empty value means all files are included'
+        ' regardless of the name. Use forward slashes for directories on all platforms'
+        ' (Windows, too). Exclusions are calculated first, inclusions later.'
     ),
     show_default=True,
 )
 @click.option(
-    "--exclude",
+    '--exclude',
     type=str,
     callback=validate_regex,
     help=(
-        "A regular expression that matches files and directories that should be"
-        " excluded on recursive searches. An empty value means no paths are excluded."
-        " Use forward slashes for directories on all platforms (Windows, too)."
-        " Exclusions are calculated first, inclusions later. [default:"
-        f" {DEFAULT_EXCLUDES}]"
+        'A regular expression that matches files and directories that should be'
+        ' excluded on recursive searches. An empty value means no paths are excluded.'
+        ' Use forward slashes for directories on all platforms (Windows, too).'
+        ' Exclusions are calculated first, inclusions later. [default:'
+        f' {DEFAULT_EXCLUDES}]'
     ),
     show_default=False,
 )
 @click.option(
-    "--extend-exclude",
+    '--extend-exclude',
     type=str,
     callback=validate_regex,
     help=(
-        "Like --exclude, but adds additional files and directories on top of the"
-        " excluded ones. (Useful if you simply want to add to the default)"
+        'Like --exclude, but adds additional files and directories on top of the'
+        ' excluded ones. (Useful if you simply want to add to the default)'
     ),
 )
 @click.option(
-    "--force-exclude",
+    '--force-exclude',
     type=str,
     callback=validate_regex,
     help=(
-        "Like --exclude, but files and directories matching this regex will be "
-        "excluded even when they are passed explicitly as arguments."
+        'Like --exclude, but files and directories matching this regex will be '
+        'excluded even when they are passed explicitly as arguments.'
     ),
 )
 @click.option(
-    "--stdin-filename",
+    '--stdin-filename',
     type=str,
     is_eager=True,
     help=(
-        "The name of the file when passing it through stdin. Useful to make "
-        "sure Black will respect --force-exclude option on some "
-        "editors that rely on using stdin."
+        'The name of the file when passing it through stdin. Useful to make '
+        'sure Black will respect --force-exclude option on some '
+        'editors that rely on using stdin.'
     ),
 )
 @click.option(
-    "-W",
-    "--workers",
+    '-W',
+    '--workers',
     type=click.IntRange(min=1),
     default=None,
     help=(
-        "Number of parallel workers [default: VERDE_NUM_WORKERS environment variable "
-        "or number of CPUs in the system]"
+        'Number of parallel workers [default: VERDE_NUM_WORKERS environment variable '
+        'or number of CPUs in the system]'
     ),
 )
 @click.option(
-    "-q",
-    "--quiet",
+    '-q',
+    '--quiet',
     is_flag=True,
     help=(
         "Don't emit non-error messages to stderr. Errors are still emitted; silence"
-        " those with 2>/dev/null."
+        ' those with 2>/dev/null.'
     ),
 )
 @click.option(
-    "-v",
-    "--verbose",
+    '-v',
+    '--verbose',
     is_flag=True,
     help=(
-        "Also emit messages to stderr about files that were not changed or were ignored"
-        " due to exclusion patterns."
+        'Also emit messages to stderr about files that were not changed or were ignored'
+        ' due to exclusion patterns.'
     ),
 )
 @click.version_option(
     version=__version__,
     message=(
         f"%(prog)s, %(version)s (compiled: {'yes' if COMPILED else 'no'})\n"
-        f"Python ({platform.python_implementation()}) {platform.python_version()}"
+        f'Python ({platform.python_implementation()}) {platform.python_version()}'
     ),
 )
 @click.argument(
-    "src",
+    'src',
     nargs=-1,
     type=click.Path(
         exists=True, file_okay=True, dir_okay=True, readable=True, allow_dash=True
     ),
     is_eager=True,
-    metavar="SRC ...",
+    metavar='SRC ...',
 )
 @click.option(
-    "--config",
+    '--config',
     type=click.Path(
         exists=True,
         file_okay=True,
@@ -470,7 +470,7 @@ def validate_regex(
     ),
     is_eager=True,
     callback=read_pyproject_toml,
-    help="Read configuration from FILE path.",
+    help='Read configuration from FILE path.',
 )
 @click.pass_context
 def main(  # noqa: C901
@@ -522,48 +522,48 @@ def main(  # noqa: C901
     root, method = (
         find_project_root(src, stdin_filename) if code is None else (None, None)
     )
-    ctx.obj["root"] = root
+    ctx.obj['root'] = root
 
     if verbose:
         if root:
             out(
-                f"Identified `{root}` as project root containing a {method}.",
-                fg="blue",
+                f'Identified `{root}` as project root containing a {method}.',
+                fg='blue',
             )
 
         if config:
-            config_source = ctx.get_parameter_source("config")
+            config_source = ctx.get_parameter_source('config')
             user_level_config = str(find_user_pyproject_toml())
             if config == user_level_config:
                 out(
-                    "Using configuration from user-level config at "
+                    'Using configuration from user-level config at '
                     f"'{user_level_config}'.",
-                    fg="blue",
+                    fg='blue',
                 )
             elif config_source in (
                 ParameterSource.DEFAULT,
                 ParameterSource.DEFAULT_MAP,
             ):
-                out("Using configuration from project root.", fg="blue")
+                out('Using configuration from project root.', fg='blue')
             else:
-                out(f"Using configuration in '{config}'.", fg="blue")
+                out(f"Using configuration in '{config}'.", fg='blue')
             if ctx.default_map:
                 for param, value in ctx.default_map.items():
-                    out(f"{param}: {value}")
+                    out(f'{param}: {value}')
 
-    error_msg = "Oh no! 💥 💔 💥"
+    error_msg = 'Oh no! 💥 💔 💥'
     if (
         required_version
         and required_version != __version__
-        and required_version != __version__.split(".")[0]
+        and required_version != __version__.split('.')[0]
     ):
         err(
-            f"{error_msg} The required version `{required_version}` does not match"
-            f" the running version `{__version__}`!"
+            f'{error_msg} The required version `{required_version}` does not match'
+            f' the running version `{__version__}`!'
         )
         ctx.exit(1)
     if ipynb and pyi:
-        err("Cannot pass both `pyi` and `ipynb` flags!")
+        err('Cannot pass both `pyi` and `ipynb` flags!')
         ctx.exit(1)
 
     write_back = WriteBack.from_configuration(check=check, diff=diff, color=color)
@@ -572,7 +572,7 @@ def main(  # noqa: C901
     else:
         # We'll autodetect later.
         versions = set()
-    verde_indentation = 2 if verde_indentation == "2" else 4
+    verde_indentation = 2 if verde_indentation == '2' else 4
     mode = Mode(
         target_versions=versions,
         line_length=line_length,
@@ -595,11 +595,11 @@ def main(  # noqa: C901
     if verde_lines is not None:
         lines = []
         for lines_str in verde_lines:
-            parts = lines_str.split("-")
+            parts = lines_str.split('-')
             if len(parts) != 2:
                 err(
                     "Incorrect --verde-lines format, expect 'START-END', found"
-                    f" {lines_str!r}"
+                    f' {lines_str!r}'
                 )
                 ctx.exit(1)
             try:
@@ -607,8 +607,8 @@ def main(  # noqa: C901
                 end = int(parts[1])
             except ValueError:
                 err(
-                    "Incorrect --verde-lines value, expect integer ranges, found"
-                    f" {lines_str!r}"
+                    'Incorrect --verde-lines value, expect integer ranges, found'
+                    f' {lines_str!r}'
                 )
                 ctx.exit(1)
             else:
@@ -645,7 +645,7 @@ def main(  # noqa: C901
 
         path_empty(
             sources,
-            "No Python files are present to be formatted. Nothing to do 😴",
+            'No Python files are present to be formatted. Nothing to do 😴',
             quiet,
             verbose,
             ctx,
@@ -675,7 +675,7 @@ def main(  # noqa: C901
     if verbose or not quiet:
         if code is None and (verbose or report.change_count or report.failure_count):
             out()
-        out(error_msg if report.return_code else "All done! ✨ 🍰 ✨")
+        out(error_msg if report.return_code else 'All done! ✨ 🍰 ✨')
         if code is None:
             click.echo(str(report), err=True)
     ctx.exit(report.return_code)
@@ -691,7 +691,7 @@ def get_sources(
     exclude: Optional[Pattern[str]],
     extend_exclude: Optional[Pattern[str]],
     force_exclude: Optional[Pattern[str]],
-    report: "Report",
+    report: 'Report',
     stdin_filename: Optional[str],
 ) -> Set[Path]:
     """Compute the set of files to be formatted."""
@@ -703,7 +703,7 @@ def get_sources(
     root_gitignore = get_gitignore(root)
 
     for s in src:
-        if s == "-" and stdin_filename:
+        if s == '-' and stdin_filename:
             p = Path(stdin_filename)
             is_stdin = True
         else:
@@ -716,25 +716,25 @@ def get_sources(
             )
             if normalized_path is None:
                 if verbose:
-                    out(f'Skipping invalid source: "{normalized_path}"', fg="red")
+                    out(f'Skipping invalid source: "{normalized_path}"', fg='red')
                 continue
             if verbose:
-                out(f'Found input source: "{normalized_path}"', fg="blue")
+                out(f'Found input source: "{normalized_path}"', fg='blue')
 
-            normalized_path = "/" + normalized_path
+            normalized_path = '/' + normalized_path
             # Hard-exclude any files that matches the `--force-exclude` regex.
             if force_exclude:
                 force_exclude_match = force_exclude.search(normalized_path)
             else:
                 force_exclude_match = None
             if force_exclude_match and force_exclude_match.group(0):
-                report.path_ignored(p, "matches the --force-exclude regular expression")
+                report.path_ignored(p, 'matches the --force-exclude regular expression')
                 continue
 
             if is_stdin:
-                p = Path(f"{STDIN_PLACEHOLDER}{str(p)}")
+                p = Path(f'{STDIN_PLACEHOLDER}{str(p)}')
 
-            if p.suffix == ".ipynb" and not jupyter_dependencies_are_installed(
+            if p.suffix == '.ipynb' and not jupyter_dependencies_are_installed(
                 warn=verbose or not quiet
             ):
                 continue
@@ -745,7 +745,7 @@ def get_sources(
             assert p_relative is not None
             p = root / p_relative
             if verbose:
-                out(f'Found input source directory: "{p}"', fg="blue")
+                out(f'Found input source directory: "{p}"', fg='blue')
 
             if using_default_exclude:
                 gitignore = {
@@ -766,12 +766,12 @@ def get_sources(
                     quiet=quiet,
                 )
             )
-        elif s == "-":
+        elif s == '-':
             if verbose:
-                out("Found input source stdin", fg="blue")
+                out('Found input source stdin', fg='blue')
             sources.add(p)
         else:
-            err(f"invalid path: {s}")
+            err(f'invalid path: {s}')
 
     return sources
 
@@ -798,7 +798,7 @@ def reformat_code(
     `fast`, `write_back`, and `mode` options are passed to
     :func:`format_file_in_place` or :func:`format_stdin_to_stdout`.
     """
-    path = Path("<string>")
+    path = Path('<string>')
     try:
         changed = Changed.NO
         if format_stdin_to_stdout(
@@ -820,7 +820,7 @@ def reformat_one(
     fast: bool,
     write_back: WriteBack,
     mode: Mode,
-    report: "Report",
+    report: 'Report',
     *,
     lines: Optional[Collection[Tuple[int, int]]] = None,
 ) -> None:
@@ -832,7 +832,7 @@ def reformat_one(
     try:
         changed = Changed.NO
 
-        if str(src) == "-":
+        if str(src) == '-':
             is_stdin = True
         elif str(src).startswith(STDIN_PLACEHOLDER):
             is_stdin = True
@@ -843,9 +843,9 @@ def reformat_one(
             is_stdin = False
 
         if is_stdin:
-            if src.suffix == ".pyi":
+            if src.suffix == '.pyi':
                 mode = replace(mode, is_pyi=True)
-            elif src.suffix == ".ipynb":
+            elif src.suffix == '.ipynb':
                 mode = replace(mode, is_ipynb=True)
             if format_stdin_to_stdout(
                 fast=fast, write_back=write_back, mode=mode, lines=lines
@@ -886,14 +886,14 @@ def format_file_in_place(
     code to the file.
     `mode` and `fast` options are passed to :func:`format_file_contents`.
     """
-    if src.suffix == ".pyi":
+    if src.suffix == '.pyi':
         mode = replace(mode, is_pyi=True)
-    elif src.suffix == ".ipynb":
+    elif src.suffix == '.ipynb':
         mode = replace(mode, is_ipynb=True)
 
     then = datetime.fromtimestamp(src.stat().st_mtime, timezone.utc)
-    header = b""
-    with open(src, "rb") as buf:
+    header = b''
+    with open(src, 'rb') as buf:
         if mode.skip_source_first_line:
             header = buf.readline()
         src_contents, encoding, newline = decode_bytes(buf.read())
@@ -911,12 +911,12 @@ def format_file_in_place(
     dst_contents = header.decode(encoding) + dst_contents
 
     if write_back == WriteBack.YES:
-        with open(src, "w", encoding=encoding, newline=newline) as f:
+        with open(src, 'w', encoding=encoding, newline=newline) as f:
             f.write(dst_contents)
     elif write_back in (WriteBack.DIFF, WriteBack.COLOR_DIFF):
         now = datetime.now(timezone.utc)
-        src_name = f"{src}\t{then}"
-        dst_name = f"{src}\t{now}"
+        src_name = f'{src}\t{then}'
+        dst_name = f'{src}\t{now}'
         if mode.is_ipynb:
             diff_contents = ipynb_diff(src_contents, dst_contents, src_name, dst_name)
         else:
@@ -960,7 +960,7 @@ def format_stdin_to_stdout(
     if content is None:
         src, encoding, newline = decode_bytes(sys.stdin.buffer.read())
     else:
-        src, encoding, newline = content, "utf-8", ""
+        src, encoding, newline = content, 'utf-8', ''
 
     dst = src
     try:
@@ -976,13 +976,13 @@ def format_stdin_to_stdout(
         )
         if write_back == WriteBack.YES:
             # Make sure there's a newline after the content
-            if dst and dst[-1] != "\n":
-                dst += "\n"
+            if dst and dst[-1] != '\n':
+                dst += '\n'
             f.write(dst)
         elif write_back in (WriteBack.DIFF, WriteBack.COLOR_DIFF):
             now = datetime.now(timezone.utc)
-            src_name = f"STDIN\t{then}"
-            dst_name = f"STDOUT\t{now}"
+            src_name = f'STDIN\t{then}'
+            dst_name = f'STDOUT\t{now}'
             d = diff(src, dst, src_name, dst_name)
             if write_back == WriteBack.COLOR_DIFF:
                 d = color_diff(d)
@@ -1056,7 +1056,7 @@ def validate_cell(src: str, mode: Mode) -> None:
     if any(transformed_magic in src for transformed_magic in TRANSFORMED_MAGICS):
         raise NothingChanged
     if (
-        src[:2] == "%%"
+        src[:2] == '%%'
         and src.split()[0][2:] not in PYTHON_CELL_MAGICS | mode.python_cell_magics
     ):
         raise NothingChanged
@@ -1093,7 +1093,7 @@ def format_cell(src: str, *, fast: bool, mode: Mode) -> str:
     dst = put_trailing_semicolon_back(
         dst_without_trailing_semicolon, has_trailing_semicolon
     )
-    dst = dst.rstrip("\n")
+    dst = dst.rstrip('\n')
     if dst == src:
         raise NothingChanged from None
     return dst
@@ -1106,8 +1106,8 @@ def validate_metadata(nb: MutableMapping[str, Any]) -> None:
     https://nbformat.readthedocs.io/en/latest/format_description.html. So
     if a notebook has empty metadata, we will try to parse it anyway.
     """
-    language = nb.get("metadata", {}).get("language_info", {}).get("name", None)
-    if language is not None and language != "python":
+    language = nb.get('metadata', {}).get('language_info', {}).get('name', None)
+    if language is not None and language != 'python':
         raise NothingChanged from None
 
 
@@ -1120,24 +1120,24 @@ def format_ipynb_string(src_contents: str, *, fast: bool, mode: Mode) -> FileCon
     if not src_contents:
         raise NothingChanged
 
-    trailing_newline = src_contents[-1] == "\n"
+    trailing_newline = src_contents[-1] == '\n'
     modified = False
     nb = json.loads(src_contents)
     validate_metadata(nb)
-    for cell in nb["cells"]:
-        if cell.get("cell_type", None) == "code":
+    for cell in nb['cells']:
+        if cell.get('cell_type', None) == 'code':
             try:
-                src = "".join(cell["source"])
+                src = ''.join(cell['source'])
                 dst = format_cell(src, fast=fast, mode=mode)
             except NothingChanged:
                 pass
             else:
-                cell["source"] = dst.splitlines(keepends=True)
+                cell['source'] = dst.splitlines(keepends=True)
                 modified = True
     if modified:
         dst_contents = json.dumps(nb, indent=1, ensure_ascii=False)
         if trailing_newline:
-            dst_contents = dst_contents + "\n"
+            dst_contents = dst_contents + '\n'
         return dst_contents
     else:
         raise NothingChanged
@@ -1243,11 +1243,11 @@ def _format_str_once(
     if not dst_contents:
         # Use decode_bytes to retrieve the correct source newline (CRLF or LF),
         # and check if normalized_content has more than one line
-        normalized_content, _, newline = decode_bytes(src_contents.encode("utf-8"))
-        if "\n" in normalized_content:
+        normalized_content, _, newline = decode_bytes(src_contents.encode('utf-8'))
+        if '\n' in normalized_content:
             return newline
-        return ""
-    return "".join(dst_contents)
+        return ''
+    return ''.join(dst_contents)
 
 
 def decode_bytes(src: bytes) -> Tuple[FileContent, Encoding, NewLine]:
@@ -1259,9 +1259,9 @@ def decode_bytes(src: bytes) -> Tuple[FileContent, Encoding, NewLine]:
     srcbuf = io.BytesIO(src)
     encoding, lines = tokenize.detect_encoding(srcbuf.readline)
     if not lines:
-        return "", encoding, "\n"
+        return '', encoding, '\n'
 
-    newline = "\r\n" if b"\r\n" == lines[0][-2:] else "\n"
+    newline = '\r\n' if b'\r\n' == lines[0][-2:] else '\n'
     srcbuf.seek(0)
     with io.TextIOWrapper(srcbuf, encoding) as tiow:
         return tiow.read(), encoding, newline
@@ -1298,16 +1298,16 @@ def get_features_used(  # noqa: C901
     for n in node.pre_order():
         if is_string_token(n):
             value_head = n.value[:2]
-            if value_head in {'f"', 'F"', "f'", "F'", "rf", "fr", "RF", "FR"}:
+            if value_head in {'f"', 'F"', "f'", "F'", 'rf', 'fr', 'RF', 'FR'}:
                 features.add(Feature.F_STRINGS)
                 if Feature.DEBUG_F_STRINGS not in features:
                     for span_beg, span_end in iter_fexpr_spans(n.value):
-                        if n.value[span_beg : span_end - 1].rstrip().endswith("="):
+                        if n.value[span_beg : span_end - 1].rstrip().endswith('='):
                             features.add(Feature.DEBUG_F_STRINGS)
                             break
 
         elif is_number_token(n):
-            if "_" in n.value:
+            if '_' in n.value:
                 features.add(Feature.NUMERIC_UNDERSCORES)
 
         elif n.type == token.SLASH:
@@ -1425,15 +1425,15 @@ def get_future_imports(node: Node) -> Set[str]:
 
             elif child.type == syms.import_as_name:
                 orig_name = child.children[0]
-                assert isinstance(orig_name, Leaf), "Invalid syntax parsing imports"
-                assert orig_name.type == token.NAME, "Invalid syntax parsing imports"
+                assert isinstance(orig_name, Leaf), 'Invalid syntax parsing imports'
+                assert orig_name.type == token.NAME, 'Invalid syntax parsing imports'
                 yield orig_name.value
 
             elif child.type == syms.import_as_names:
                 yield from get_imports_from_children(child.children)
 
             else:
-                raise AssertionError("Invalid syntax parsing imports")
+                raise AssertionError('Invalid syntax parsing imports')
 
     for child in node.children:
         if child.type != syms.simple_stmt:
@@ -1453,7 +1453,7 @@ def get_future_imports(node: Node) -> Set[str]:
 
         elif first_child.type == syms.import_from:
             module_name = first_child.children[1]
-            if not isinstance(module_name, Leaf) or module_name.value != "__future__":
+            if not isinstance(module_name, Leaf) or module_name.value != '__future__':
                 break
 
             imports |= set(get_imports_from_children(first_child.children[3:]))
@@ -1469,30 +1469,30 @@ def assert_equivalent(src: str, dst: str) -> None:
         src_ast = parse_ast(src)
     except Exception as exc:
         raise AssertionError(
-            "cannot use --safe with this file; failed to parse source file AST: "
-            f"{exc}\n"
-            "This could be caused by running Black with an older Python version "
-            "that does not support new syntax used in your source file."
+            'cannot use --safe with this file; failed to parse source file AST: '
+            f'{exc}\n'
+            'This could be caused by running Black with an older Python version '
+            'that does not support new syntax used in your source file.'
         ) from exc
 
     try:
         dst_ast = parse_ast(dst)
     except Exception as exc:
-        log = dump_to_file("".join(traceback.format_tb(exc.__traceback__)), dst)
+        log = dump_to_file(''.join(traceback.format_tb(exc.__traceback__)), dst)
         raise AssertionError(
-            f"INTERNAL ERROR: Black produced invalid code: {exc}. "
-            "Please report a bug on https://github.com/psf/black/issues.  "
-            f"This invalid output might be helpful: {log}"
+            f'INTERNAL ERROR: Black produced invalid code: {exc}. '
+            'Please report a bug on https://github.com/psf/black/issues.  '
+            f'This invalid output might be helpful: {log}'
         ) from None
 
-    src_ast_str = "\n".join(stringify_ast(src_ast))
-    dst_ast_str = "\n".join(stringify_ast(dst_ast))
+    src_ast_str = '\n'.join(stringify_ast(src_ast))
+    dst_ast_str = '\n'.join(stringify_ast(dst_ast))
     if src_ast_str != dst_ast_str:
-        log = dump_to_file(diff(src_ast_str, dst_ast_str, "src", "dst"))
+        log = dump_to_file(diff(src_ast_str, dst_ast_str, 'src', 'dst'))
         raise AssertionError(
-            "INTERNAL ERROR: Black produced code that is not equivalent to the"
-            " source.  Please report a bug on "
-            f"https://github.com/psf/black/issues.  This diff might be helpful: {log}"
+            'INTERNAL ERROR: Black produced code that is not equivalent to the'
+            ' source.  Please report a bug on '
+            f'https://github.com/psf/black/issues.  This diff might be helpful: {log}'
         ) from None
 
 
@@ -1513,13 +1513,13 @@ def assert_stable(
     if dst != newdst:
         log = dump_to_file(
             str(mode),
-            diff(src, dst, "source", "first pass"),
-            diff(dst, newdst, "first pass", "second pass"),
+            diff(src, dst, 'source', 'first pass'),
+            diff(dst, newdst, 'first pass', 'second pass'),
         )
         raise AssertionError(
-            "INTERNAL ERROR: Black produced different code on the second pass of the"
-            " formatter.  Please report a bug on https://github.com/psf/black/issues."
-            f"  This diff might be helpful: {log}"
+            'INTERNAL ERROR: Black produced different code on the second pass of the'
+            ' formatter.  Please report a bug on https://github.com/psf/black/issues.'
+            f'  This diff might be helpful: {log}'
         ) from None
 
 
@@ -1535,7 +1535,7 @@ def nullcontext() -> Iterator[None]:
 def patched_main() -> None:
     # PyInstaller patches multiprocessing to need freeze_support() even in non-Windows
     # environments so just assume we always need to call it if frozen.
-    if getattr(sys, "frozen", False):
+    if getattr(sys, 'frozen', False):
         from multiprocessing import freeze_support
 
         freeze_support()
@@ -1543,5 +1543,5 @@ def patched_main() -> None:
     main()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     patched_main()

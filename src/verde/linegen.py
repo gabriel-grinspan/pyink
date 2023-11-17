@@ -198,8 +198,8 @@ class LineGenerator(Visitor[Line]):
             )
 
             if not already_parenthesized:
-                lpar = Leaf(token.LPAR, "")
-                rpar = Leaf(token.RPAR, "")
+                lpar = Leaf(token.LPAR, '')
+                rpar = Leaf(token.RPAR, '')
                 node.insert_child(0, lpar)
                 node.append_child(rpar)
 
@@ -250,15 +250,15 @@ class LineGenerator(Visitor[Line]):
 
     def visit_typeparams(self, node: Node) -> Iterator[Line]:
         yield from self.visit_default(node)
-        node.children[0].prefix = ""
+        node.children[0].prefix = ''
 
     def visit_typevartuple(self, node: Node) -> Iterator[Line]:
         yield from self.visit_default(node)
-        node.children[1].prefix = ""
+        node.children[1].prefix = ''
 
     def visit_paramspec(self, node: Node) -> Iterator[Line]:
         yield from self.visit_default(node)
-        node.children[1].prefix = ""
+        node.children[1].prefix = ''
 
     def visit_dictsetmaker(self, node: Node) -> Iterator[Line]:
         if Preview.wrap_long_dict_values_in_parens in self.mode:
@@ -388,9 +388,9 @@ class LineGenerator(Visitor[Line]):
                 # Ensure that we are in an attribute trailer
                 and next_leaf.children[0].type == token.DOT
                 # It shouldn't wrap hexadecimal, binary and octal literals
-                and not value.startswith(("0x", "0b", "0o"))
+                and not value.startswith(('0x', '0b', '0o'))
                 # It shouldn't wrap complex literals
-                and "j" not in value
+                and 'j' not in value
             ):
                 wrap_in_parentheses(node, leaf)
 
@@ -423,8 +423,8 @@ class LineGenerator(Visitor[Line]):
             and len(operand.children) == 3
             and operand.children[1].type == token.DOUBLESTAR
         ):
-            lpar = Leaf(token.LPAR, "(")
-            rpar = Leaf(token.RPAR, ")")
+            lpar = Leaf(token.LPAR, '(')
+            rpar = Leaf(token.RPAR, ')')
             index = operand.remove() or 0
             node.insert_child(index, Node(syms.atom, [lpar, operand, rpar]))
         yield from self.visit_default(node)
@@ -454,7 +454,7 @@ class LineGenerator(Visitor[Line]):
         ):
             normalize_unicode_escape_sequences(leaf)
 
-        if is_docstring(leaf, self.mode.is_verde) and "\\\n" not in leaf.value:
+        if is_docstring(leaf, self.mode.is_verde) and '\\\n' not in leaf.value:
             # We're ignoring docstrings with backslash newline escapes because changing
             # indentation of those changes the AST representation of the code.
             if self.mode.string_normalization:
@@ -481,9 +481,9 @@ class LineGenerator(Visitor[Line]):
             quote_len = 1 if docstring[1] != quote_char else 3
             docstring = docstring[quote_len:-quote_len]
             docstring_started_empty = not docstring
-            indent = " " * self.current_line.indentation_spaces()
+            indent = ' ' * self.current_line.indentation_spaces()
 
-            original_has_trailing_newline = docstring.endswith("\n")
+            original_has_trailing_newline = docstring.endswith('\n')
             if is_multiline_string(leaf):
                 docstring = fix_docstring(docstring, indent)
             else:
@@ -493,18 +493,18 @@ class LineGenerator(Visitor[Line]):
             if docstring:
                 # Add some padding if the docstring starts / ends with a quote mark.
                 if docstring[0] == quote_char:
-                    docstring = " " + docstring
+                    docstring = ' ' + docstring
                 if docstring[-1] == quote_char:
-                    docstring += " "
-                if docstring[-1] == "\\":
-                    backslash_count = len(docstring) - len(docstring.rstrip("\\"))
+                    docstring += ' '
+                if docstring[-1] == '\\':
+                    backslash_count = len(docstring) - len(docstring.rstrip('\\'))
                     if backslash_count % 2:
                         # Odd number of tailing backslashes, add some padding to
                         # avoid escaping the closing string quote.
-                        docstring += " "
+                        docstring += ' '
                         has_trailing_backslash = True
             elif not docstring_started_empty:
-                docstring = " "
+                docstring = ' '
 
             # We could enforce triple quotes at this point.
             quote = quote_char * quote_len
@@ -521,7 +521,7 @@ class LineGenerator(Visitor[Line]):
                     # When docstring ends with '\n' the last line is empty,
                     # not the last item from splitlines().
                     len(lines[-1])
-                    if docstring and not docstring.endswith("\n")
+                    if docstring and not docstring.endswith('\n')
                     else 0
                 )
 
@@ -534,16 +534,16 @@ class LineGenerator(Visitor[Line]):
                     and len(indent) + quote_len <= self.mode.line_length
                     and not has_trailing_backslash
                 ):
-                    leaf.value = prefix + quote + docstring + "\n" + indent + quote
+                    leaf.value = prefix + quote + docstring + '\n' + indent + quote
                 elif (
                     not indent
                     and len(lines) > 1
-                    and not docstring.endswith("\n")
+                    and not docstring.endswith('\n')
                     and original_has_trailing_newline
                 ):
                     # Special case for module docstrings that put trailing quotes on
                     # their own line.
-                    leaf.value = prefix + quote + docstring + "\n" + indent + quote
+                    leaf.value = prefix + quote + docstring + '\n' + indent + quote
                 else:
                     leaf.value = prefix + quote + docstring + quote
             else:
@@ -557,30 +557,30 @@ class LineGenerator(Visitor[Line]):
 
         v = self.visit_stmt
         Ø: Set[str] = set()
-        self.visit_assert_stmt = partial(v, keywords={"assert"}, parens={"assert", ","})
+        self.visit_assert_stmt = partial(v, keywords={'assert'}, parens={'assert', ','})
         self.visit_if_stmt = partial(
-            v, keywords={"if", "else", "elif"}, parens={"if", "elif"}
+            v, keywords={'if', 'else', 'elif'}, parens={'if', 'elif'}
         )
-        self.visit_while_stmt = partial(v, keywords={"while", "else"}, parens={"while"})
-        self.visit_for_stmt = partial(v, keywords={"for", "else"}, parens={"for", "in"})
+        self.visit_while_stmt = partial(v, keywords={'while', 'else'}, parens={'while'})
+        self.visit_for_stmt = partial(v, keywords={'for', 'else'}, parens={'for', 'in'})
         self.visit_try_stmt = partial(
-            v, keywords={"try", "except", "else", "finally"}, parens=Ø
+            v, keywords={'try', 'except', 'else', 'finally'}, parens=Ø
         )
-        self.visit_except_clause = partial(v, keywords={"except"}, parens={"except"})
-        self.visit_with_stmt = partial(v, keywords={"with"}, parens={"with"})
-        self.visit_classdef = partial(v, keywords={"class"}, parens=Ø)
+        self.visit_except_clause = partial(v, keywords={'except'}, parens={'except'})
+        self.visit_with_stmt = partial(v, keywords={'with'}, parens={'with'})
+        self.visit_classdef = partial(v, keywords={'class'}, parens=Ø)
 
         # When this is moved out of preview, add ":" directly to ASSIGNMENTS in nodes.py
         if Preview.parenthesize_long_type_hints in self.mode:
-            assignments = ASSIGNMENTS | {":"}
+            assignments = ASSIGNMENTS | {':'}
         else:
             assignments = ASSIGNMENTS
         self.visit_expr_stmt = partial(v, keywords=Ø, parens=assignments)
 
-        self.visit_return_stmt = partial(v, keywords={"return"}, parens={"return"})
+        self.visit_return_stmt = partial(v, keywords={'return'}, parens={'return'})
         if not self.mode.is_verde:
-            self.visit_import_from = partial(v, keywords=Ø, parens={"import"})
-        self.visit_del_stmt = partial(v, keywords=Ø, parens={"del"})
+            self.visit_import_from = partial(v, keywords=Ø, parens={'import'})
+        self.visit_del_stmt = partial(v, keywords=Ø, parens={'del'})
         self.visit_async_funcdef = self.visit_async_stmt
         self.visit_decorated = self.visit_decorators
 
@@ -688,7 +688,7 @@ def transform_line(
         # __name__ attribute which is needed in `run_transformer` further down.
         # Unfortunately a nested class breaks mypyc too. So a class must be created
         # via type ... https://github.com/mypyc/mypyc/issues/884
-        rhs = type("rhs", (), {"__call__": _rhs})()
+        rhs = type('rhs', (), {'__call__': _rhs})()
 
         if Preview.string_processing in mode:
             if line.inside_brackets:
@@ -804,7 +804,7 @@ def left_hand_split(
                 matching_bracket = leaf
                 current_leaves = body_leaves
     if not matching_bracket:
-        raise CannotSplit("No brackets found")
+        raise CannotSplit('No brackets found')
 
     head = bracket_split_build_line(
         head_leaves, line, matching_bracket, component=_BracketSplitComponent.head
@@ -870,7 +870,7 @@ def _first_right_hand_split(
         # If there is no opening or closing_bracket that means the split failed and
         # all content is in the tail.  Otherwise, if `head_leaves` are empty, it means
         # the matching `opening_bracket` wasn't available on `line` anymore.
-        raise CannotSplit("No brackets found")
+        raise CannotSplit('No brackets found')
 
     tail_leaves.reverse()
     body_leaves.reverse()
@@ -993,10 +993,10 @@ def _maybe_split_omitting_optional_parens(
                 or rhs.tail.contains_multiline_strings()
             ):
                 raise CannotSplit(
-                    "The current optional pair of parentheses is bound to fail to"
-                    " satisfy the splitting algorithm because the head or the tail"
-                    " contains multiline strings which by definition never fit one"
-                    " line."
+                    'The current optional pair of parentheses is bound to fail to'
+                    ' satisfy the splitting algorithm because the head or the tail'
+                    ' contains multiline strings which by definition never fit one'
+                    ' line.'
                 ) from e
 
     ensure_visible(rhs.opening_bracket)
@@ -1052,12 +1052,12 @@ def bracket_split_succeeded_or_raise(head: Line, body: Line, tail: Line) -> None
     tail_len = len(str(tail).strip())
     if not body:
         if tail_len == 0:
-            raise CannotSplit("Splitting brackets produced the same line")
+            raise CannotSplit('Splitting brackets produced the same line')
 
         elif tail_len < 3:
             raise CannotSplit(
-                f"Splitting brackets on an empty body to save {tail_len} characters is"
-                " not worth it"
+                f'Splitting brackets on an empty body to save {tail_len} characters is'
+                ' not worth it'
             )
 
 
@@ -1088,7 +1088,7 @@ def bracket_split_build_line(
             # be careful not to add one after any comments or within type annotations.
             no_commas = (
                 original.is_def
-                and opening_bracket.value == "("
+                and opening_bracket.value == '('
                 and not any(leaf.type == token.COMMA for leaf in leaves)
                 # In particular, don't add one within a parenthesized return annotation.
                 # Unfortunately the indicator we're in a return annotation (RARROW) may
@@ -1100,7 +1100,7 @@ def bracket_split_build_line(
                     node.prev_sibling.type == RARROW
                     for node in (
                         leaves[0].parent,
-                        getattr(leaves[0].parent, "parent", None),
+                        getattr(leaves[0].parent, 'parent', None),
                     )
                     if isinstance(node, Node) and isinstance(node.prev_sibling, Leaf)
                 )
@@ -1126,7 +1126,7 @@ def bracket_split_build_line(
                         continue
 
                     if leaves[i].type != token.COMMA:
-                        new_comma = Leaf(token.COMMA, ",")
+                        new_comma = Leaf(token.COMMA, ',')
                         leaves.insert(i + 1, new_comma)
                     break
 
@@ -1180,7 +1180,7 @@ def _safe_add_trailing_comma(safe: bool, delimiter_priority: int, line: Line) ->
         and line.leaves[-1].type != token.COMMA
         and line.leaves[-1].type != STANDALONE_COMMENT
     ):
-        new_comma = Leaf(token.COMMA, ",")
+        new_comma = Leaf(token.COMMA, ',')
         line.append(new_comma)
     return line
 
@@ -1197,17 +1197,17 @@ def delimiter_split(
     try:
         last_leaf = line.leaves[-1]
     except IndexError:
-        raise CannotSplit("Line empty") from None
+        raise CannotSplit('Line empty') from None
 
     bt = line.bracket_tracker
     try:
         delimiter_priority = bt.max_delimiter_priority(exclude={id(last_leaf)})
     except ValueError:
-        raise CannotSplit("No delimiters found") from None
+        raise CannotSplit('No delimiters found') from None
 
     if delimiter_priority == DOT_PRIORITY:
         if bt.delimiter_count_with_priority(delimiter_priority) == 1:
-            raise CannotSplit("Splitting a single attribute from its owner looks wrong")
+            raise CannotSplit('Splitting a single attribute from its owner looks wrong')
 
     current_line = Line(
         mode=line.mode, depth=line.depth, inside_brackets=line.inside_brackets
@@ -1275,7 +1275,7 @@ def standalone_comment_split(
 ) -> Iterator[Line]:
     """Split standalone comments from the rest of the line."""
     if not line.contains_standalone_comments(0):
-        raise CannotSplit("Line does not have any standalone comments")
+        raise CannotSplit('Line does not have any standalone comments')
 
     current_line = Line(
         mode=line.mode, depth=line.depth, inside_brackets=line.inside_brackets
@@ -1311,15 +1311,15 @@ def normalize_prefix(leaf: Leaf, *, inside_brackets: bool) -> None:
     Note: don't use backslashes for formatting or you'll lose your voting rights.
     """
     if not inside_brackets:
-        spl = leaf.prefix.split("#")
-        if "\\" not in spl[0]:
-            nl_count = spl[-1].count("\n")
+        spl = leaf.prefix.split('#')
+        if '\\' not in spl[0]:
+            nl_count = spl[-1].count('\n')
             if len(spl) > 1:
                 nl_count -= 1
-            leaf.prefix = "\n" * nl_count
+            leaf.prefix = '\n' * nl_count
             return
 
-    leaf.prefix = ""
+    leaf.prefix = ''
 
 
 def normalize_invisible_parens(
@@ -1367,7 +1367,7 @@ def normalize_invisible_parens(
                 and node.type == syms.for_stmt
                 and isinstance(child.prev_sibling, Leaf)
                 and child.prev_sibling.type == token.NAME
-                and child.prev_sibling.value == "for"
+                and child.prev_sibling.value == 'for'
             ):
                 if maybe_make_parens_invisible_in_atom(
                     child,
@@ -1414,12 +1414,12 @@ def _normalize_import_from(parent: Node, child: LN, index: int) -> None:
     if is_lpar_token(child):
         assert is_rpar_token(parent.children[-1])
         # make parentheses invisible
-        child.value = ""
-        parent.children[-1].value = ""
+        child.value = ''
+        parent.children[-1].value = ''
     elif child.type != token.STAR:
         # insert invisible parentheses
-        parent.insert_child(index, Leaf(token.LPAR, ""))
-        parent.append_child(Leaf(token.RPAR, ""))
+        parent.insert_child(index, Leaf(token.LPAR, ''))
+        parent.append_child(Leaf(token.RPAR, ''))
 
 
 def remove_await_parens(node: Node) -> None:
@@ -1480,8 +1480,8 @@ def _maybe_wrap_cms_in_parens(
             colon_index = i
             break
     if colon_index is not None:
-        lpar = Leaf(token.LPAR, "")
-        rpar = Leaf(token.RPAR, "")
+        lpar = Leaf(token.LPAR, '')
+        rpar = Leaf(token.RPAR, '')
         context_managers = node.children[1:colon_index]
         for child in context_managers:
             child.remove()
@@ -1598,8 +1598,8 @@ def maybe_make_parens_invisible_in_atom(
             # ignore annotation, then we do not remove the parentheses
             not is_type_ignore_comment_string(middle.prefix.strip())
         ):
-            first.value = ""
-            last.value = ""
+            first.value = ''
+            last.value = ''
         maybe_make_parens_invisible_in_atom(
             middle,
             parent=parent,
@@ -1619,7 +1619,7 @@ def maybe_make_parens_invisible_in_atom(
 def should_split_line(line: Line, opening_bracket: Leaf) -> bool:
     """Should `line` be immediately split with `delimiter_split()` after RHS?"""
 
-    if not (opening_bracket.parent and opening_bracket.value in "[{("):
+    if not (opening_bracket.parent and opening_bracket.value in '[{('):
         return False
 
     # We're essentially checking if the body is delimited by commas and there's more
@@ -1725,21 +1725,21 @@ def run_transformer(
     mode: Mode,
     features: Collection[Feature],
     *,
-    line_str: str = "",
+    line_str: str = '',
 ) -> List[Line]:
     if not line_str:
         line_str = line_to_string(line)
     result: List[Line] = []
     for transformed_line in transform(line, features, mode):
-        if str(transformed_line).strip("\n") == line_str:
-            raise CannotTransform("Line transformer returned an unchanged result")
+        if str(transformed_line).strip('\n') == line_str:
+            raise CannotTransform('Line transformer returned an unchanged result')
 
         result.extend(transform_line(transformed_line, mode=mode, features=features))
 
     features_set = set(features)
     if (
         Feature.FORCE_OPTIONAL_PARENTHESES in features_set
-        or transform.__class__.__name__ != "rhs"
+        or transform.__class__.__name__ != 'rhs'
         or not line.bracket_tracker.invisible
         or any(bracket.value for bracket in line.bracket_tracker.invisible)
         or line.contains_multiline_strings()

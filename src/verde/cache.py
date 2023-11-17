@@ -37,8 +37,8 @@ def get_cache_dir() -> Path:
     repeated calls.
     """
     # NOTE: Function mostly exists as a clean way to test getting the cache directory.
-    default_cache_dir = user_cache_dir("verde")
-    cache_dir = Path(os.environ.get("VERDE_CACHE_DIR", default_cache_dir))
+    default_cache_dir = user_cache_dir('verde')
+    cache_dir = Path(os.environ.get('VERDE_CACHE_DIR', default_cache_dir))
     cache_dir = cache_dir / __version__
     return cache_dir
 
@@ -47,7 +47,7 @@ CACHE_DIR = get_cache_dir()
 
 
 def get_cache_file(mode: Mode) -> Path:
-    return CACHE_DIR / f"cache.{mode.get_cache_key()}.pickle"
+    return CACHE_DIR / f'cache.{mode.get_cache_key()}.pickle'
 
 
 @dataclass
@@ -67,7 +67,7 @@ class Cache:
         if not cache_file.exists():
             return cls(mode, cache_file)
 
-        with cache_file.open("rb") as fobj:
+        with cache_file.open('rb') as fobj:
             try:
                 data: Dict[str, Tuple[float, int, str]] = pickle.load(fobj)
                 file_data = {k: FileData(*v) for k, v in data.items()}

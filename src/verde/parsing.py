@@ -53,8 +53,8 @@ def get_grammars(target_versions: Set[TargetVersion]) -> List[Grammar]:
 
 def lib2to3_parse(src_txt: str, target_versions: Iterable[TargetVersion] = ()) -> Node:
     """Given a string with source, return the lib2to3 Node."""
-    if not src_txt.endswith("\n"):
-        src_txt += "\n"
+    if not src_txt.endswith('\n'):
+        src_txt += '\n'
 
     grammars = get_grammars(set(target_versions))
     errors = {}
@@ -70,16 +70,16 @@ def lib2to3_parse(src_txt: str, target_versions: Iterable[TargetVersion] = ()) -
             try:
                 faulty_line = lines[lineno - 1]
             except IndexError:
-                faulty_line = "<line number missing in source>"
+                faulty_line = '<line number missing in source>'
             errors[grammar.version] = InvalidInput(
-                f"Cannot parse: {lineno}:{column}: {faulty_line}"
+                f'Cannot parse: {lineno}:{column}: {faulty_line}'
             )
 
         except TokenError as te:
             # In edge cases these are raised; and typically don't have a "faulty_line".
             lineno, column = te.args[1]
             errors[grammar.version] = InvalidInput(
-                f"Cannot parse: {lineno}:{column}: {te.args[0]}"
+                f'Cannot parse: {lineno}:{column}: {te.args[0]}'
             )
 
     else:
@@ -112,7 +112,7 @@ def lib2to3_unparse(node: Node) -> str:
 def parse_single_version(
     src: str, version: Tuple[int, int], *, type_comments: bool
 ) -> ast.AST:
-    filename = "<unknown>"
+    filename = '<unknown>'
     return ast.parse(
         src, filename, feature_version=version, type_comments=type_comments
     )
@@ -122,7 +122,7 @@ def parse_ast(src: str) -> ast.AST:
     # TODO: support Python 4+ ;)
     versions = [(3, minor) for minor in range(3, sys.version_info[1] + 1)]
 
-    first_error = ""
+    first_error = ''
     for version in sorted(versions, reverse=True):
         try:
             return parse_single_version(src, version, type_comments=True)
@@ -156,7 +156,7 @@ def stringify_ast(node: ast.AST, depth: int = 0) -> Iterator[str]:
     if (
         isinstance(node, ast.Constant)
         and isinstance(node.value, str)
-        and node.kind == "u"
+        and node.kind == 'u'
     ):
         # It's a quirk of history that we strip the u prefix over here. We used to
         # rewrite the AST nodes for Python version compatibility and we never copied
@@ -182,7 +182,7 @@ def stringify_ast(node: ast.AST, depth: int = 0) -> Iterator[str]:
                 # Ignore nested tuples within del statements, because we may insert
                 # parentheses and they change the AST.
                 if (
-                    field == "targets"
+                    field == 'targets'
                     and isinstance(node, ast.Delete)
                     and isinstance(item, ast.Tuple)
                 ):
@@ -199,14 +199,14 @@ def stringify_ast(node: ast.AST, depth: int = 0) -> Iterator[str]:
             normalized: object
             if (
                 isinstance(node, ast.Constant)
-                and field == "value"
+                and field == 'value'
                 and isinstance(value, str)
             ):
                 # Constant strings may be indented across newlines, if they are
                 # docstrings; fold spaces after newlines when comparing. Similarly,
                 # trailing and leading space may be removed.
-                normalized = _normalize("\n", value)
-            elif field == "type_comment" and isinstance(value, str):
+                normalized = _normalize('\n', value)
+            elif field == 'type_comment' and isinstance(value, str):
                 # Trailing whitespace in type comments is removed.
                 normalized = value.rstrip()
             else:

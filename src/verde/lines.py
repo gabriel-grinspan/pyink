@@ -41,13 +41,13 @@ from blib2to3.pgen2 import token
 from blib2to3.pytree import Leaf, Node
 
 # types
-T = TypeVar("T")
+T = TypeVar('T')
 Index = int
 LeafID = int
 LN = Union[Leaf, Node]
 
 # This regex should contain a single capture group capturing the entire match.
-_PRAGMA_REGEX = re.compile("( *# (?:pylint|pytype):)")
+_PRAGMA_REGEX = re.compile('( *# (?:pylint|pytype):)')
 
 
 class Indentation(Enum):
@@ -123,11 +123,11 @@ class Line:
         """
         if not self.bracket_tracker.depth:
             if self.is_comment:
-                raise ValueError("cannot append to standalone comments")
+                raise ValueError('cannot append to standalone comments')
 
             if self.leaves and leaf.type == STANDALONE_COMMENT:
                 raise ValueError(
-                    "cannot append standalone comments to a populated line"
+                    'cannot append standalone comments to a populated line'
                 )
 
         self.append(leaf, preformatted=preformatted)
@@ -158,14 +158,14 @@ class Line:
         return (
             bool(self)
             and self.leaves[0].type == token.NAME
-            and self.leaves[0].value == "class"
+            and self.leaves[0].value == 'class'
         )
 
     @property
     def is_stub_class(self) -> bool:
         """Is this line a class definition with a body consisting only of "..."?"""
         return self.is_class and self.leaves[-3:] == [
-            Leaf(token.DOT, ".") for _ in range(3)
+            Leaf(token.DOT, '.') for _ in range(3)
         ]
 
     @property
@@ -180,18 +180,18 @@ class Line:
             second_leaf: Optional[Leaf] = self.leaves[1]
         except IndexError:
             second_leaf = None
-        return (first_leaf.type == token.NAME and first_leaf.value == "def") or (
+        return (first_leaf.type == token.NAME and first_leaf.value == 'def') or (
             first_leaf.type == token.ASYNC
             and second_leaf is not None
             and second_leaf.type == token.NAME
-            and second_leaf.value == "def"
+            and second_leaf.value == 'def'
         )
 
     @property
     def is_stub_def(self) -> bool:
         """Is this line a function definition with a body consisting only of "..."?"""
-        return self.is_def and self.leaves[-4:] == [Leaf(token.COLON, ":")] + [
-            Leaf(token.DOT, ".") for _ in range(3)
+        return self.is_def and self.leaves[-4:] == [Leaf(token.COLON, ':')] + [
+            Leaf(token.DOT, '.') for _ in range(3)
         ]
 
     @property
@@ -205,9 +205,9 @@ class Line:
             and len(self.leaves) == 4
             and self.is_class
             and self.leaves[2].type == token.LPAR
-            and self.leaves[2].value == "("
+            and self.leaves[2].value == '('
             and self.leaves[3].type == token.RPAR
-            and self.leaves[3].value == ")"
+            and self.leaves[3].value == ')'
         )
 
     @property
@@ -413,7 +413,7 @@ class Line:
             comment.type == STANDALONE_COMMENT
             and self.bracket_tracker.any_open_brackets()
         ):
-            comment.prefix = ""
+            comment.prefix = ''
             return False
 
         if comment.type != token.COMMENT:
@@ -421,7 +421,7 @@ class Line:
 
         if not self.leaves:
             comment.type = STANDALONE_COMMENT
-            comment.prefix = ""
+            comment.prefix = ''
             return False
 
         last_leaf = self.leaves[-1]
@@ -437,7 +437,7 @@ class Line:
             # this avoids unstable formatting caused by comment migration.
             if len(self.leaves) < 2:
                 comment.type = STANDALONE_COMMENT
-                comment.prefix = ""
+                comment.prefix = ''
                 return False
 
             last_leaf = self.leaves[-2]
@@ -487,7 +487,7 @@ class Line:
         )
         for index, leaf in op(self.leaves):
             length = len(leaf.prefix) + len(leaf.value)
-            if "\n" in leaf.value:
+            if '\n' in leaf.value:
                 return  # Multiline strings, we can't continue.
 
             for comment in self.comments_after(leaf):
@@ -495,7 +495,7 @@ class Line:
 
             yield index, leaf, length
 
-    def clone(self) -> "Line":
+    def clone(self) -> 'Line':
         return Line(
             mode=self.mode,
             depth=self.depth,
@@ -507,18 +507,18 @@ class Line:
     def __str__(self) -> str:
         """Render the line."""
         if not self:
-            return "\n"
+            return '\n'
 
-        indent = " " * self.indentation_spaces()
+        indent = ' ' * self.indentation_spaces()
         leaves = iter(self.leaves)
         first = next(leaves)
-        res = f"{first.prefix}{indent}{first.value}"
+        res = f'{first.prefix}{indent}{first.value}'
         for leaf in leaves:
             res += str(leaf)
         for comment in itertools.chain.from_iterable(self.comments.values()):
             res += str(comment)
 
-        return res + "\n"
+        return res + '\n'
 
     def __bool__(self) -> bool:
         """Return True if the line has leaves or comments."""
@@ -545,7 +545,7 @@ class LinesBlock:
     """
 
     mode: Mode
-    previous_block: Optional["LinesBlock"]
+    previous_block: Optional['LinesBlock']
     original_line: Line
     before: int = 0
     content_lines: List[str] = field(default_factory=list)
@@ -631,9 +631,9 @@ class EmptyLineTracker:
         if current_line.leaves:
             # Consume the first leaf's extra newlines.
             first_leaf = current_line.leaves[0]
-            before = first_leaf.prefix.count("\n")
+            before = first_leaf.prefix.count('\n')
             before = min(before, max_allowed)
-            first_leaf.prefix = ""
+            first_leaf.prefix = ''
         else:
             before = 0
 
@@ -669,7 +669,7 @@ class EmptyLineTracker:
                     and current_line.leaves[-1].type == token.COLON
                     and (
                         current_line.leaves[0].value
-                        not in ("with", "try", "for", "while", "if", "match")
+                        not in ('with', 'try', 'for', 'while', 'if', 'match')
                     )
                 ):
                     # We shouldn't add two newlines between an indented function and
@@ -863,7 +863,7 @@ def append_leaves(
 
 
 def is_line_short_enough(  # noqa: C901
-    line: Line, *, mode: Mode, line_str: str = ""
+    line: Line, *, mode: Mode, line_str: str = ''
 ) -> bool:
     """For non-multiline strings, return True if `line` is no longer than `line_length`.
     For multiline strings, looks at the context around `line` to determine
@@ -882,17 +882,17 @@ def is_line_short_enough(  # noqa: C901
     if Preview.multiline_string_handling not in mode:
         return (
             effective_length <= mode.line_length
-            and "\n" not in line_str  # multiline strings
+            and '\n' not in line_str  # multiline strings
             and not line.contains_standalone_comments()
         )
 
     if line.contains_standalone_comments():
         return False
-    if "\n" not in line_str:
+    if '\n' not in line_str:
         # No multiline strings (MLS) present
         return effective_length <= mode.line_length
 
-    first, *_, last = line_str.split("\n")
+    first, *_, last = line_str.split('\n')
     if width(first) > mode.line_length or width(last) > mode.line_length:
         return False
 
@@ -1034,7 +1034,7 @@ def can_omit_invisible_parens(
         # A single stranded method call doesn't require optional parentheses.
         return True
 
-    assert len(line.leaves) >= 2, "Stranded delimiter"
+    assert len(line.leaves) >= 2, 'Stranded delimiter'
 
     # With a single delimiter, omit if the expression starts or ends with
     # a bracket.
@@ -1124,4 +1124,4 @@ def line_to_string(line: Line) -> str:
 
     WARNING: This is known to be computationally expensive.
     """
-    return str(line).strip("\n")
+    return str(line).strip('\n')

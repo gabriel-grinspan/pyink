@@ -59,7 +59,7 @@ def find_project_root(
     project root was discovered.
     """
     if stdin_filename is not None:
-        srcs = tuple(stdin_filename if s == "-" else s for s in srcs)
+        srcs = tuple(stdin_filename if s == '-' else s for s in srcs)
     if not srcs:
         srcs = [str(Path.cwd().resolve())]
 
@@ -77,16 +77,16 @@ def find_project_root(
     )
 
     for directory in (common_base, *common_base.parents):
-        if (directory / ".git").exists():
-            return directory, ".git directory"
+        if (directory / '.git').exists():
+            return directory, '.git directory'
 
-        if (directory / ".hg").is_dir():
-            return directory, ".hg directory"
+        if (directory / '.hg').is_dir():
+            return directory, '.hg directory'
 
-        if (directory / "pyproject.toml").is_file():
-            return directory, "pyproject.toml"
+        if (directory / 'pyproject.toml').is_file():
+            return directory, 'pyproject.toml'
 
-    return directory, "file system root"
+    return directory, 'file system root'
 
 
 def find_pyproject_toml(
@@ -94,7 +94,7 @@ def find_pyproject_toml(
 ) -> Optional[str]:
     """Find the absolute filepath to a pyproject.toml if it exists"""
     path_project_root, _ = find_project_root(path_search_start, stdin_filename)
-    path_pyproject_toml = path_project_root / "pyproject.toml"
+    path_pyproject_toml = path_project_root / 'pyproject.toml'
     if path_pyproject_toml.is_file():
         return str(path_pyproject_toml)
 
@@ -107,7 +107,7 @@ def find_pyproject_toml(
         )
     except (PermissionError, RuntimeError) as e:
         # We do not have access to the user-level config directory, so ignore it.
-        err(f"Ignoring user configuration directory due to {e!r}")
+        err(f'Ignoring user configuration directory due to {e!r}')
         return None
 
 
@@ -117,15 +117,15 @@ def parse_pyproject_toml(path_config: str) -> Dict[str, Any]:
 
     If parsing fails, will raise a tomllib.TOMLDecodeError.
     """
-    with open(path_config, "rb") as f:
+    with open(path_config, 'rb') as f:
         pyproject_toml = tomllib.load(f)
-    config: Dict[str, Any] = pyproject_toml.get("tool", {}).get("verde", {})
-    config = {k.replace("--", "").replace("-", "_"): v for k, v in config.items()}
+    config: Dict[str, Any] = pyproject_toml.get('tool', {}).get('verde', {})
+    config = {k.replace('--', '').replace('-', '_'): v for k, v in config.items()}
 
-    if "target_version" not in config:
+    if 'target_version' not in config:
         inferred_target_version = infer_target_version(pyproject_toml)
         if inferred_target_version is not None:
-            config["target_version"] = [v.name.lower() for v in inferred_target_version]
+            config['target_version'] = [v.name.lower() for v in inferred_target_version]
 
     return config
 
@@ -140,8 +140,8 @@ def infer_target_version(
 
     If the target version cannot be inferred, returns None.
     """
-    project_metadata = pyproject_toml.get("project", {})
-    requires_python = project_metadata.get("requires-python", None)
+    project_metadata = pyproject_toml.get('project', {})
+    requires_python = project_metadata.get('requires-python', None)
     if requires_python is not None:
         try:
             return parse_req_python_version(requires_python)
@@ -180,7 +180,7 @@ def parse_req_python_specifier(requires_python: str) -> Optional[List[TargetVers
     if not specifier_set:
         return None
 
-    target_version_map = {f"3.{v.value}": v for v in TargetVersion}
+    target_version_map = {f'3.{v.value}': v for v in TargetVersion}
     compatible_versions: List[str] = list(specifier_set.filter(target_version_map))
     if compatible_versions:
         return [target_version_map[v] for v in compatible_versions]
@@ -195,21 +195,21 @@ def strip_specifier_set(specifier_set: SpecifierSet) -> SpecifierSet:
     """
     specifiers = []
     for s in specifier_set:
-        if "*" in str(s):
+        if '*' in str(s):
             specifiers.append(s)
-        elif s.operator in ["~=", "==", ">=", "==="]:
+        elif s.operator in ['~=', '==', '>=', '===']:
             version = Version(s.version)
-            stripped = Specifier(f"{s.operator}{version.major}.{version.minor}")
+            stripped = Specifier(f'{s.operator}{version.major}.{version.minor}')
             specifiers.append(stripped)
-        elif s.operator == ">":
+        elif s.operator == '>':
             version = Version(s.version)
             if len(version.release) > 2:
-                s = Specifier(f">={version.major}.{version.minor}")
+                s = Specifier(f'>={version.major}.{version.minor}')
             specifiers.append(s)
         else:
             specifiers.append(s)
 
-    return SpecifierSet(",".join(str(s) for s in specifiers))
+    return SpecifierSet(','.join(str(s) for s in specifiers))
 
 
 @lru_cache
@@ -223,27 +223,27 @@ def find_user_pyproject_toml() -> Path:
     - RuntimeError: if the current user has no homedir
     - PermissionError: if the current process cannot access the user's homedir
     """
-    if sys.platform == "win32":
+    if sys.platform == 'win32':
         # Windows
-        user_config_path = Path.home() / ".verde"
+        user_config_path = Path.home() / '.verde'
     else:
-        config_root = os.environ.get("XDG_CONFIG_HOME", "~/.config")
-        user_config_path = Path(config_root).expanduser() / "verde"
+        config_root = os.environ.get('XDG_CONFIG_HOME', '~/.config')
+        user_config_path = Path(config_root).expanduser() / 'verde'
     return user_config_path.resolve()
 
 
 @lru_cache
 def get_gitignore(root: Path) -> PathSpec:
     """Return a PathSpec matching gitignore content if present."""
-    gitignore = root / ".gitignore"
+    gitignore = root / '.gitignore'
     lines: List[str] = []
     if gitignore.is_file():
-        with gitignore.open(encoding="utf-8") as gf:
+        with gitignore.open(encoding='utf-8') as gf:
             lines = gf.readlines()
     try:
-        return PathSpec.from_lines("gitwildmatch", lines)
+        return PathSpec.from_lines('gitwildmatch', lines)
     except GitWildMatchPatternError as e:
-        err(f"Could not parse {gitignore}: {e}")
+        err(f'Could not parse {gitignore}: {e}')
         raise
 
 
@@ -264,13 +264,13 @@ def normalize_path_maybe_ignore(
         except ValueError:
             if report:
                 report.path_ignored(
-                    path, f"is a symbolic link that points outside {root}"
+                    path, f'is a symbolic link that points outside {root}'
                 )
             return None
 
     except OSError as e:
         if report:
-            report.path_ignored(path, f"cannot be read because {e}")
+            report.path_ignored(path, f'cannot be read because {e}')
         return None
 
     return root_relative_path
@@ -292,7 +292,7 @@ def _path_is_ignored(
             break
         if pattern.match_file(relative_path):
             report.path_ignored(
-                path.relative_to(root), "matches a .gitignore file content"
+                path.relative_to(root), 'matches a .gitignore file content'
             )
             return True
     return False
@@ -328,7 +328,7 @@ def gen_python_files(
     `report` is where output about exclusions goes.
     """
 
-    assert root.is_absolute(), f"INTERNAL ERROR: `root` must be absolute but is {root}"
+    assert root.is_absolute(), f'INTERNAL ERROR: `root` must be absolute but is {root}'
     for child in paths:
         root_relative_path = child.absolute().relative_to(root).as_posix()
 
@@ -339,22 +339,22 @@ def gen_python_files(
             continue
 
         # Then ignore with `--exclude` `--extend-exclude` and `--force-exclude` options.
-        root_relative_path = "/" + root_relative_path
+        root_relative_path = '/' + root_relative_path
         if child.is_dir():
-            root_relative_path += "/"
+            root_relative_path += '/'
 
         if path_is_excluded(root_relative_path, exclude):
-            report.path_ignored(child, "matches the --exclude regular expression")
+            report.path_ignored(child, 'matches the --exclude regular expression')
             continue
 
         if path_is_excluded(root_relative_path, extend_exclude):
             report.path_ignored(
-                child, "matches the --extend-exclude regular expression"
+                child, 'matches the --extend-exclude regular expression'
             )
             continue
 
         if path_is_excluded(root_relative_path, force_exclude):
-            report.path_ignored(child, "matches the --force-exclude regular expression")
+            report.path_ignored(child, 'matches the --force-exclude regular expression')
             continue
 
         normalized_path = normalize_path_maybe_ignore(child, root, report)
@@ -385,7 +385,7 @@ def gen_python_files(
             )
 
         elif child.is_file():
-            if child.suffix == ".ipynb" and not jupyter_dependencies_are_installed(
+            if child.suffix == '.ipynb' and not jupyter_dependencies_are_installed(
                 warn=verbose or not quiet
             ):
                 continue
@@ -396,7 +396,7 @@ def gen_python_files(
 
 def wrap_stream_for_windows(
     f: io.TextIOWrapper,
-) -> Union[io.TextIOWrapper, "colorama.AnsiToWin32"]:
+) -> Union[io.TextIOWrapper, 'colorama.AnsiToWin32']:
     """
     Wrap stream with colorama's wrap_stream so colors are shown on Windows.
 

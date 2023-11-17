@@ -38,9 +38,9 @@ def maybe_install_uvloop() -> None:
         pass
 
 
-def cancel(tasks: Iterable["asyncio.Task[Any]"]) -> None:
+def cancel(tasks: Iterable['asyncio.Task[Any]']) -> None:
     """asyncio signal handler that cancels all `tasks` and reports to stderr."""
-    err("Aborted!")
+    err('Aborted!')
     for task in tasks:
         task.cancel()
 
@@ -60,7 +60,7 @@ def shutdown(loop: asyncio.AbstractEventLoop) -> None:
         # `concurrent.futures.Future` objects cannot be cancelled once they
         # are already running. There might be some when the `shutdown()` happened.
         # Silence their logger's spew about the event loop being closed.
-        cf_logger = logging.getLogger("concurrent.futures")
+        cf_logger = logging.getLogger('concurrent.futures')
         cf_logger.setLevel(logging.CRITICAL)
         loop.close()
 
@@ -81,9 +81,9 @@ def reformat_many(
 
     executor: Executor
     if workers is None:
-        workers = int(os.environ.get("VERDE_NUM_WORKERS", 0))
+        workers = int(os.environ.get('VERDE_NUM_WORKERS', 0))
         workers = workers or os.cpu_count() or 1
-    if sys.platform == "win32":
+    if sys.platform == 'win32':
         # Work around https://bugs.python.org/issue26903
         workers = min(workers, 60)
     try:
@@ -123,9 +123,9 @@ async def schedule_formatting(
     fast: bool,
     write_back: WriteBack,
     mode: Mode,
-    report: "Report",
+    report: 'Report',
     loop: asyncio.AbstractEventLoop,
-    executor: "Executor",
+    executor: 'Executor',
 ) -> None:
     """Run formatting of `sources` in parallel using the provided `executor`.
 

@@ -36,14 +36,14 @@ class Report:
     def done(self, src: Path, changed: Changed) -> None:
         """Increment the counter for successful reformatting. Write out a message."""
         if changed is Changed.YES:
-            reformatted = "would reformat" if self.check or self.diff else "reformatted"
+            reformatted = 'would reformat' if self.check or self.diff else 'reformatted'
             if self.verbose or not self.quiet:
-                out(f"{reformatted} {src}")
+                out(f'{reformatted} {src}')
             self.change_count += 1
         else:
             if self.verbose:
                 if changed is Changed.NO:
-                    msg = f"{src} already well formatted, good job."
+                    msg = f'{src} already well formatted, good job.'
                 else:
                     msg = f"{src} wasn't modified on disk since last run."
                 out(msg, bold=False)
@@ -51,12 +51,12 @@ class Report:
 
     def failed(self, src: Path, message: str) -> None:
         """Increment the counter for failed reformatting. Write out a message."""
-        err(f"error: cannot format {src}: {message}")
+        err(f'error: cannot format {src}: {message}')
         self.failure_count += 1
 
     def path_ignored(self, path: Path, message: str) -> None:
         if self.verbose:
-            out(f"{path} ignored: {message}", bold=False)
+            out(f'{path} ignored: {message}', bold=False)
 
     @property
     def return_code(self) -> int:
@@ -83,25 +83,25 @@ class Report:
         Use `click.unstyle` to remove colors.
         """
         if self.check or self.diff:
-            reformatted = "would be reformatted"
-            unchanged = "would be left unchanged"
-            failed = "would fail to reformat"
+            reformatted = 'would be reformatted'
+            unchanged = 'would be left unchanged'
+            failed = 'would fail to reformat'
         else:
-            reformatted = "reformatted"
-            unchanged = "left unchanged"
-            failed = "failed to reformat"
+            reformatted = 'reformatted'
+            unchanged = 'left unchanged'
+            failed = 'failed to reformat'
         report = []
         if self.change_count:
-            s = "s" if self.change_count > 1 else ""
+            s = 's' if self.change_count > 1 else ''
             report.append(
-                style(f"{self.change_count} file{s} ", bold=True, fg="blue")
-                + style(f"{reformatted}", bold=True)
+                style(f'{self.change_count} file{s} ', bold=True, fg='blue')
+                + style(f'{reformatted}', bold=True)
             )
 
         if self.same_count:
-            s = "s" if self.same_count > 1 else ""
-            report.append(style(f"{self.same_count} file{s} ", fg="blue") + unchanged)
+            s = 's' if self.same_count > 1 else ''
+            report.append(style(f'{self.same_count} file{s} ', fg='blue') + unchanged)
         if self.failure_count:
-            s = "s" if self.failure_count > 1 else ""
-            report.append(style(f"{self.failure_count} file{s} {failed}", fg="red"))
-        return ", ".join(report) + "."
+            s = 's' if self.failure_count > 1 else ''
+            report.append(style(f'{self.failure_count} file{s} {failed}', fg='red'))
+        return ', '.join(report) + '.'

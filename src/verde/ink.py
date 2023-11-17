@@ -107,7 +107,7 @@ class _TopLevelStatementsVisitor(Visitor[None]):
             return
         assert (
             newline_leaf.type == NEWLINE
-        ), f"Unexpectedly found leaf.type={newline_leaf.type}"
+        ), f'Unexpectedly found leaf.type={newline_leaf.type}'
         # We need to find the furthest ancestor with the NEWLINE as the last
         # leaf, since a `suite` can simply be a `simple_stmt` when it puts
         # its body on the same line. Example: `if cond: pass`.
@@ -159,7 +159,7 @@ def _convert_unchanged_line_by_line(node: Node, lines_set: Set[int]):
                 nodes_to_ignore.insert(0, prev_sibling)
                 prev_sibling = prev_sibling.prev_sibling
             if not nodes_to_ignore:
-                assert False, "Unexpected empty nodes in the match_stmt"
+                assert False, 'Unexpected empty nodes in the match_stmt'
                 continue
             if not _get_line_range(nodes_to_ignore).intersection(lines_set):
                 _convert_nodes_to_standalone_comment(nodes_to_ignore, newline=leaf)
@@ -174,7 +174,7 @@ def _convert_unchanged_line_by_line(node: Node, lines_set: Set[int]):
                 nodes_to_ignore.insert(0, parent_sibling)
                 parent_sibling = parent_sibling.prev_sibling
             if not nodes_to_ignore:
-                assert False, "Unexpected empty nodes before suite"
+                assert False, 'Unexpected empty nodes before suite'
                 continue
             # Special case for `async_stmt` and `async_funcdef` where the ASYNC
             # token is on the grandparent node.
@@ -209,7 +209,7 @@ def _convert_node_to_standalone_comment(node: LN):
     first_leaf = _first_leaf(node)
     last_leaf = _last_leaf(node)
     if not first_leaf or not last_leaf:
-        assert False, "Unexpected empty first_leaf or last_leaf"
+        assert False, 'Unexpected empty first_leaf or last_leaf'
         return
     if first_leaf is last_leaf:
         # This can happen on the following edge cases:
@@ -225,7 +225,7 @@ def _convert_node_to_standalone_comment(node: LN):
     # This also means the indentation will be changed on the unchanged lines, and
     # this is actually required to not break incremental reformatting.
     prefix = first_leaf.prefix
-    first_leaf.prefix = ""
+    first_leaf.prefix = ''
     index = node.remove()
     if index is not None:
         # Remove the '\n', as STANDALONE_COMMENT will have '\n' appended when
@@ -251,12 +251,12 @@ def _convert_nodes_to_standalone_comment(nodes: Sequence[LN], *, newline: Leaf):
     if not parent or not first_leaf:
         return
     prefix = first_leaf.prefix
-    first_leaf.prefix = ""
-    value = "".join(str(node) for node in nodes)
+    first_leaf.prefix = ''
+    value = ''.join(str(node) for node in nodes)
     # The prefix comment on the NEWLINE leaf is the trailing comment of the statement.
     if newline.prefix:
         value += newline.prefix
-        newline.prefix = ""
+        newline.prefix = ''
     index = nodes[0].remove()
     for node in nodes[1:]:
         node.remove()
@@ -298,7 +298,7 @@ def _leaf_line_end(leaf: Leaf) -> int:
         return leaf.lineno
     else:
         # Leaf nodes like multiline strings can occupy multiple lines.
-        return leaf.lineno + str(leaf).count("\n")
+        return leaf.lineno + str(leaf).count('\n')
 
 
 def _get_line_range(node_or_nodes: Union[LN, List[LN]]) -> Set[int]:
